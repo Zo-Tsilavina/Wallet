@@ -3,18 +3,15 @@ package models;
 import java.util.Objects;
 
 public class Account {
+    private int id;
     private String name;
     private int currencyId;
-
-    public Account(String name, int currencyId) {
-        this.name = name;
-        this.currencyId = currencyId;
-    }
 
     @Override
     public String toString() {
         return "Account{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", currencyId=" + currencyId +
                 '}';
     }
@@ -24,12 +21,20 @@ public class Account {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Account account = (Account) o;
-        return currencyId == account.currencyId && Objects.equals(name, account.name);
+        return id == account.id && currencyId == account.currencyId && Objects.equals(name, account.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, currencyId);
+        return Objects.hash(id, name, currencyId);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -45,6 +50,12 @@ public class Account {
     }
 
     public void setCurrencyId(int currencyId) {
+        this.currencyId = currencyId;
+    }
+
+    public Account(int id, String name, int currencyId) {
+        this.id = id;
+        this.name = name;
         this.currencyId = currencyId;
     }
 }

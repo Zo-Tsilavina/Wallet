@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 public class Transaction {
+    private int id;
     private Double value;
     private String description;
     private int accountId;
@@ -13,7 +14,8 @@ public class Transaction {
     @Override
     public String toString() {
         return "Transaction{" +
-                "value=" + value +
+                "id=" + id +
+                ", value=" + value +
                 ", description='" + description + '\'' +
                 ", accountId=" + accountId +
                 ", date_transaction=" + date_transaction +
@@ -26,12 +28,20 @@ public class Transaction {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Transaction that = (Transaction) o;
-        return accountId == that.accountId && Objects.equals(value, that.value) && Objects.equals(description, that.description) && Objects.equals(date_transaction, that.date_transaction) && Objects.equals(type, that.type);
+        return id == that.id && accountId == that.accountId && Objects.equals(value, that.value) && Objects.equals(description, that.description) && Objects.equals(date_transaction, that.date_transaction) && Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value, description, accountId, date_transaction, type);
+        return Objects.hash(id, value, description, accountId, date_transaction, type);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Double getValue() {
@@ -74,7 +84,8 @@ public class Transaction {
         this.type = type;
     }
 
-    public Transaction(Double value, String description, int accountId, Timestamp date_transaction, String type) {
+    public Transaction(int id, Double value, String description, int accountId, Timestamp date_transaction, String type) {
+        this.id = id;
         this.value = value;
         this.description = description;
         this.accountId = accountId;
