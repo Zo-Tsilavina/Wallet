@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountCrudOperations implements CrudOperations<Account>{
-    private final ConnectionDB connectionDB;
+    private static ConnectionDB connectionDB;
 
-    public AccountCrudOperations(ConnectionDB connectionDB) {
+    public AccountCrudOperations() {
         this.connectionDB = connectionDB;
     }
 
