@@ -5,5 +5,5 @@ CREATE TABLE currency(
      symbol VARCHAR(50)
 );
 
-INSERT INTO currency(name, symbole) VALUES ("EUR - euro", "€");
-INSERT INTO currency(name, symbole) VALUES ("Dollar - Dollar", "$");
+INSERT INTO currency(name, symbol) VALUES ('EUR - euro', '€');
+INSERT INTO currency(name, symbol) VALUES ('Dollar - Dollar', '$');

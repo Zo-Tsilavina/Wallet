@@ -5,5 +5,5 @@ CREATE TABLE accounts(
      currency_id int REFERENCES currency(currency_id)
 );
 
-INSERT INTO accounts (name, currency_id) VALUES (BMOI, 2);
-INSERT INTO accounts (name, currency_id) VALUES (BOA, 1);
+INSERT INTO accounts (name, currency_id) VALUES ('BMOI', 2);
+INSERT INTO accounts (name, currency_id) VALUES ('BOA', 1);
