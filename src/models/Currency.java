@@ -4,13 +4,13 @@ import java.util.Objects;
 
 public class Currency {
     private String name;
-    private String symbole;
+    private String symbol;
 
     @Override
     public String toString() {
         return "Currency{" +
                 "name='" + name + '\'' +
-                ", symbole='" + symbole + '\'' +
+                ", symbol='" + symbol + '\'' +
                 '}';
     }
 
@@ -19,12 +19,12 @@ public class Currency {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Currency currency = (Currency) o;
-        return Objects.equals(name, currency.name) && Objects.equals(symbole, currency.symbole);
+        return Objects.equals(name, currency.name) && Objects.equals(symbol, currency.symbol);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, symbole);
+        return Objects.hash(name, symbol);
     }
 
     public String getName() {
@@ -36,15 +36,15 @@ public class Currency {
     }
 
     public String getSymbole() {
-        return symbole;
+        return symbol;
     }
 
     public void setSymbole(String symbole) {
-        this.symbole = symbole;
+        this.symbol = symbol;
     }
 
-    public Currency(String name, String symbole) {
+    public Currency(String name, String symbol) {
         this.name = name;
-        this.symbole = symbole;
+        this.symbol = symbol;
     }
 }
