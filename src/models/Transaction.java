@@ -8,8 +8,9 @@ public class Transaction {
     private Double value;
     private String description;
     private int accountId;
-    private Timestamp date_transaction;
     private String type;
+    private Timestamp date_transaction;
+
 
     @Override
     public String toString() {

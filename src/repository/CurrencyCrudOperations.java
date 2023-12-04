@@ -60,7 +60,7 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
         ){
             statement.setString(1, currency.getName());
             statement.setString(2, currency.getSymbol());
-            statement.setInt(2, id);
+            statement.setInt(3, id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
