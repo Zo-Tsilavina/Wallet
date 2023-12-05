@@ -1,11 +1,14 @@
 import repository.AccountCrudOperations;
-import repository.CrudOperations;
+import repository.CurrencyCrudOperations;
+import repository.TransactionCrudOperations;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-        accountCrudOperations.findAll();
+        System.out.println(accountCrudOperations.findAll());
+        CurrencyCrudOperations currencyCrudOperations = new CurrencyCrudOperations();
+        System.out.println(currencyCrudOperations.findAll());
+        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+        System.out.println(transactionCrudOperations.findAll());
     }
 }

@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountCrudOperations implements CrudOperations<Account>{
-    private static ConnectionDB connectionDB;
+    private ConnectionDB connectionDB;
 
     public AccountCrudOperations() {
-        this.connectionDB = connectionDB;
+        this.connectionDB = new ConnectionDB();
     }
 
     @Override
@@ -27,9 +27,9 @@ public class AccountCrudOperations implements CrudOperations<Account>{
         ){
           while (resultSet.next()){
               Account account = new Account(
-                      resultSet.getInt("account_id"),
+                      resultSet.getInt("accounts_id"),
                       resultSet.getString("name"),
-                      resultSet.getInt("current_id")
+                      resultSet.getInt("currency_id")
               );
               accounts.add(account);
           }

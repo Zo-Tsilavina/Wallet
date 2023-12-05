@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionCrudOperations implements CrudOperations<Transaction>{
-    private static ConnectionDB connectionDB;
+    private ConnectionDB connectionDB;
 
-    public TransactionCrudOperations(ConnectionDB connectionDB) {
-        this.connectionDB = connectionDB;
+    public TransactionCrudOperations() {
+        this.connectionDB = new ConnectionDB();
     }
 
     @Override

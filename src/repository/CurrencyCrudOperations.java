@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencyCrudOperations implements CrudOperations<Currency>{
-    private static ConnectionDB connectionDB;
+    private ConnectionDB connectionDB;
 
-    public CurrencyCrudOperations(ConnectionDB connectionDB) {
-        this.connectionDB = connectionDB;
+    public CurrencyCrudOperations() {
+        this.connectionDB = new ConnectionDB();
     }
 
     @Override
