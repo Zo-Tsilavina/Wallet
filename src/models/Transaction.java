@@ -1,17 +1,16 @@
 package models;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.Objects;
 
 public class Transaction {
     private int id;
     private String label;
     private Double value;
-    private LocalDate dateTimeTransaction;
+    private Timestamp dateTimeTransaction;
     private String typeTransaction;
 
-    public Transaction(int id, String label, Double value, LocalDate dateTimeTransaction, String typeTransaction) {
+    public Transaction(int id, String label, Double value, Timestamp dateTimeTransaction, String typeTransaction) {
         this.id = id;
         this.label = label;
         this.value = value;
@@ -43,11 +42,11 @@ public class Transaction {
         this.value = value;
     }
 
-    public LocalDate getDateTimeTransaction() {
+    public Timestamp getDateTimeTransaction() {
         return dateTimeTransaction;
     }
 
-    public void setDateTimeTransaction(LocalDate dateTimeTransaction) {
+    public void setDateTimeTransaction(Timestamp dateTimeTransaction) {
         this.dateTimeTransaction = dateTimeTransaction;
     }
 

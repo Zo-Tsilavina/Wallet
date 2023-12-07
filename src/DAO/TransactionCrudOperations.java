@@ -17,6 +17,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
         this.connectionDB = new ConnectionDB();
     }
 
+
     @Override
     public List<Transaction> findAll() {
         List<Transaction> transactions = new ArrayList<>();
@@ -28,11 +29,10 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
             while (resultSet.next()){
                 Transaction transaction = new Transaction(
                         resultSet.getInt("transaction_id"),
+                        resultSet.getString("label"),
                         resultSet.getDouble("value"),
-                        resultSet.getString("description"),
-                        resultSet.getInt("account_id"),
-                        resultSet.getTimestamp("date_transaction"),
-                        resultSet.getString("type")
+                        resultSet.getTimestamp("date_time_transaction"),
+                        resultSet.getString("type_transaction")
                 );
                 transactions.add(transaction);
             }
@@ -43,33 +43,47 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
     }
 
     @Override
-    public void create(Transaction transaction) {
-        try(
+    public Transaction save(Transaction transaction) {
+        try (
                 Connection connection = connectionDB.getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO transaction (value, description, account_id, type, date_transaction) VALUES (?, ?, ?, ?, ?)")
+                PreparedStatement selectStatement = connection.prepareStatement(
+                        "SELECT * FROM transaction WHERE label = ? AND value = ? AND date_time_transaction = ? AND type_transaction = ?"
+                )
         ) {
-            statement.setDouble(1, transaction.getValue());
-            statement.setString(2, transaction.getDescription());
-            statement.setInt(3, transaction.getAccountId());
-            statement.setString(4, transaction.getType());
-            statement.setTimestamp(5, transaction.getDate_transaction());
+            selectStatement.setString(1, transaction.getLabel());
+            selectStatement.setDouble(2, transaction.getValue());
+            selectStatement.setTimestamp(3, transaction.getDateTimeTransaction());
+            selectStatement.setString(4, transaction.getTypeTransaction());
+
+            try (ResultSet resultSet = selectStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    try (PreparedStatement updateStatement = connection.prepareStatement(
+                            "UPDATE transaction SET value = ?, date_time_transaction = ? WHERE label = ? AND type_transaction = ?"
+                    )) {
+                        updateStatement.setDouble(1, transaction.getValue());
+                        updateStatement.setTimestamp(2, transaction.getDateTimeTransaction());
+                        updateStatement.setString(3, transaction.getLabel());
+                        updateStatement.setString(4, transaction.getTypeTransaction());
+
+                        updateStatement.executeUpdate();
+                    }
+                } else {
+                    try (PreparedStatement insertStatement = connection.prepareStatement(
+                            "INSERT INTO transaction (label, value, date_time_transaction, type_transaction) VALUES (?, ?, ?, ?)"
+                    )) {
+                        insertStatement.setString(1, transaction.getLabel());
+                        insertStatement.setDouble(2, transaction.getValue());
+                        insertStatement.setTimestamp(3, transaction.getDateTimeTransaction());
+                        insertStatement.setString(4, transaction.getTypeTransaction());
+
+
+                        insertStatement.executeUpdate();
+                    }
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    @Override
-    public void updateById(Transaction transaction, int id) {
-        try (Connection connection = connectionDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement("UPDATE transaction SET value = ?, description = ?, account_id= ?, type = ?, date_transaction = ? WHERE transaction_id = ?");
-        ){
-            statement.setDouble(1, transaction.getValue());
-            statement.setString(2, transaction.getDescription());
-            statement.setInt(3, transaction.getAccountId());
-            statement.setString(4, transaction.getType());
-            statement.setTimestamp(5, transaction.getDate_transaction());
-            statement.setInt(6, id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return transaction;
     }
 }
