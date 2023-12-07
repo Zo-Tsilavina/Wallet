@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class Account {
     private int id;
-    private String nom;
+    private String name;
     private double amount;
     private LocalDate lastUpdateDate;
     private int transactionsId;
@@ -15,7 +15,7 @@ public class Account {
     public String toString() {
         return "Account{" +
                 "id=" + id +
-                ", nom='" + nom + '\'' +
+                ", name='" + name + '\'' +
                 ", amount=" + amount +
                 ", lastUpdateDate=" + lastUpdateDate +
                 ", transactionsId=" + transactionsId +
@@ -24,8 +24,8 @@ public class Account {
                 '}';
     }
 
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setAmount(double amount) {
@@ -48,8 +48,8 @@ public class Account {
         return id;
     }
 
-    public String getNom() {
-        return nom;
+    public String getName() {
+        return name;
     }
 
     public double getAmount() {
@@ -72,9 +72,9 @@ public class Account {
         return type;
     }
 
-    public Account(int id, String nom, double amount, LocalDate lastUpdateDate, int transactionsId, int currencyId, String type) {
+    public Account(int id, String name, double amount, LocalDate lastUpdateDate, int transactionsId, int currencyId, String type) {
         this.id = id;
-        this.nom = nom;
+        this.name = name;
         this.amount = amount;
         this.lastUpdateDate = lastUpdateDate;
         this.transactionsId = transactionsId;
