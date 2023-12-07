@@ -2,10 +2,9 @@ package DAO;
 
 import JDBC.ConnectionDB;
 import models.Account;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import models.Transaction;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,4 +89,60 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return account;
     }
 
+    public Account doTransaction (Transaction transaction, Account account){
+
+        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+
+        transactionCrudOperations.save(transaction);
+
+        if(transaction.getTypeTransaction().equals("debit")){
+
+            account.setAmount(account.getAmount() - transaction.getValue());
+            account.setTransactionsId(transaction.getId());
+            account.setLastUpdateDate(transaction.getDateTimeTransaction());
+            accountCrudOperations.save(account);
+
+        } else if (transaction.getTypeTransaction().equals("credit")) {
+
+            account.setAmount(account.getAmount() + transaction.getValue());
+            account.setTransactionsId(transaction.getId());
+            accountCrudOperations.save(account);
+
+        }
+        return account;
+    }
+    public Account getAccountBalance (Timestamp timestamp){
+        List<Transaction> transactionList = new ArrayList<>();
+
+//        recuperer le compte concerner
+//        recuperer tout les transaction lie compte conserner a partir de idTransaction
+//        prendre le solde actuel du compte en question
+//        remonter le solde jusqu'a la date donner c.a.d (+) pour debit et (-) pour credit
+
+    }
+    public List<Account> getAccountBalanceHistory (Timestamp startDate, Timestamp endDate, Account account){
+
+//          recuperer le solde a la date startDate a l'aide de getAccountBalance
+//          recuperer toute les transactions lie a ce compte durant le periode defini
+//          recuperer le solde du compte a chaque transaction durant cette periode
+
+    }
+    public List<Account> transfert (Account crediteur , Account debiteur){
+
+//            verifier si ce n est pas le meme :
+//                - si oui : le transfert ne peut pas avoir lieu
+//                - sinon:
+//                    verifier si les deux comptes ont le meme devise
+//                        -si oui:
+//                            cree une nouvelle transaction pour chaque compte
+//                                (type debit pour le crediteur et de type credit pour l'autre)
+//                            effectuer un doTransaction() pour chaque compte pour mettre a jour leur solde
+//
+//                                    pour la fonction pour l'historique :
+//                                         ... (cree l'entity d'abord)
+//                        -si non:
+//
+
+    }
 }
