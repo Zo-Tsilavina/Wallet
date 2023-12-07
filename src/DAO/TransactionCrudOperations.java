@@ -57,7 +57,6 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
             e.printStackTrace();
         }
     }
-        System.out.println(accountCrudOperations.save(test));
     @Override
     public void updateById(Transaction transaction, int id) {
         try (Connection connection = connectionDB.getConnection();
