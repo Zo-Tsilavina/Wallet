@@ -2,6 +2,7 @@
 package DAO;
 
 import JDBC.ConnectionDB;
+import models.Account;
 import models.Currency;
 
 import java.sql.Connection;
@@ -17,8 +18,6 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
     public CurrencyCrudOperations() {
         this.connectionDB = new ConnectionDB();
     }
-
-
     @Override
     public List<Currency> findAll() {
         List<Currency> currencies = new ArrayList<>();
@@ -31,7 +30,7 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
                 Currency currency = new Currency(
                         resultSet.getInt("currency_id"),
                         resultSet.getString("name"),
-                        resultSet.getString("symbol")
+                        resultSet.getString("code")
                 );
                 currencies.add(currency);
             }
@@ -42,28 +41,40 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
     }
 
     @Override
-    public void create(Currency currency) {
-        try(
+    public Currency save(Currency currency) {
+        try (
                 Connection connection = connectionDB.getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO currency (name, symbol) VALUES (?, ?)")
+                PreparedStatement selectStatement = connection.prepareStatement(
+                        "SELECT * FROM currency WHERE name = ? AND code = ?"
+                )
         ) {
-            statement.setString(1, currency.getName());
-            statement.setString(2, currency.getSymbol());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+            selectStatement.setString(1, currency.getName());
+            selectStatement.setString(2, currency.getCode());
 
-    @Override
-    public void updateById(Currency currency, int id) {
-        try (Connection connection = connectionDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement("UPDATE currency SET name = ?, symbol = ? WHERE currency_id = ?");
-        ){
-            statement.setString(1, currency.getName());
-            statement.setString(2, currency.getSymbol());
-            statement.setInt(3, id);
+            try (ResultSet resultSet = selectStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    try (PreparedStatement updateStatement = connection.prepareStatement(
+                            "UPDATE currency SET name = ?, code = ?"
+                    )) {
+                        updateStatement.setString(1, currency.getName());
+                        updateStatement.setString(2, currency.getCode());
+
+                        updateStatement.executeUpdate();
+                    }
+                } else {
+                    try (PreparedStatement insertStatement = connection.prepareStatement(
+                            "INSERT INTO currency (name, code) VALUES (?, ?)"
+                    )) {
+                        insertStatement.setString(1, currency.getName());
+                        insertStatement.setString(2, currency.getCode());
+
+                        insertStatement.executeUpdate();
+                    }
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return currency;
     }
 }

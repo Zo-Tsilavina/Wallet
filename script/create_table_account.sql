@@ -9,3 +9,5 @@ CREATE TABLE accounts(
      type VARCHAR(50)
 );
 
+INSERT INTO accounts (name, amount, transaction_id, currency_id, type) VALUES ('compte courant', 500, 1, 1, 'Bank');
+INSERT INTO accounts (name, amount, transaction_id, currency_id, type) VALUES ('compte epargne', 200, 2, 2, 'Mobile money');
