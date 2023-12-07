@@ -1,40 +1,22 @@
 package models;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class Transaction {
     private int id;
+    private String label;
     private Double value;
-    private String description;
-    private int accountId;
-    private String type;
-    private Timestamp date_transaction;
+    private LocalDate dateTimeTransaction;
+    private String typeTransaction;
 
-
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "id=" + id +
-                ", value=" + value +
-                ", description='" + description + '\'' +
-                ", accountId=" + accountId +
-                ", date_transaction=" + date_transaction +
-                ", type='" + type + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Transaction that = (Transaction) o;
-        return id == that.id && accountId == that.accountId && Objects.equals(value, that.value) && Objects.equals(description, that.description) && Objects.equals(date_transaction, that.date_transaction) && Objects.equals(type, that.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, value, description, accountId, date_transaction, type);
+    public Transaction(int id, String label, Double value, LocalDate dateTimeTransaction, String typeTransaction) {
+        this.id = id;
+        this.label = label;
+        this.value = value;
+        this.dateTimeTransaction = dateTimeTransaction;
+        this.typeTransaction = typeTransaction;
     }
 
     public int getId() {
@@ -45,6 +27,14 @@ public class Transaction {
         this.id = id;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public Double getValue() {
         return value;
     }
@@ -53,44 +43,43 @@ public class Transaction {
         this.value = value;
     }
 
-    public String getDescription() {
-        return description;
+    public LocalDate getDateTimeTransaction() {
+        return dateTimeTransaction;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDateTimeTransaction(LocalDate dateTimeTransaction) {
+        this.dateTimeTransaction = dateTimeTransaction;
     }
 
-    public int getAccountId() {
-        return accountId;
+    public String getTypeTransaction() {
+        return typeTransaction;
     }
 
-    public void setAccountId(int accountId) {
-        this.accountId = accountId;
+    public void setTypeTransaction(String typeTransaction) {
+        this.typeTransaction = typeTransaction;
     }
 
-    public Timestamp getDate_transaction() {
-        return date_transaction;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return id == that.id && Objects.equals(label, that.label) && Objects.equals(value, that.value) && Objects.equals(dateTimeTransaction, that.dateTimeTransaction) && Objects.equals(typeTransaction, that.typeTransaction);
     }
 
-    public void setDate_transaction(Timestamp date_transaction) {
-        this.date_transaction = date_transaction;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, label, value, dateTimeTransaction, typeTransaction);
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Transaction(int id, Double value, String description, int accountId, Timestamp date_transaction, String type) {
-        this.id = id;
-        this.value = value;
-        this.description = description;
-        this.accountId = accountId;
-        this.date_transaction = date_transaction;
-        this.type = type;
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", label='" + label + '\'' +
+                ", value=" + value +
+                ", dateTimeTransaction=" + dateTimeTransaction +
+                ", typeTransaction='" + typeTransaction + '\'' +
+                '}';
     }
 }
