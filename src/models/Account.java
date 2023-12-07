@@ -1,12 +1,14 @@
 package models;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 
 public class Account {
+
     private int id;
     private String name;
     private double amount;
-    private LocalDate lastUpdateDate;
+    private Timestamp lastUpdateDate;
     private int transactionsId;
     private int currencyId;
     private String type;
@@ -32,7 +34,7 @@ public class Account {
         this.amount = amount;
     }
 
-    public void setLastUpdateDate(LocalDate lastUpdateDate) {
+    public void setLastUpdateDate(Timestamp lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 
@@ -56,7 +58,7 @@ public class Account {
         return amount;
     }
 
-    public LocalDate getLastUpdateDate() {
+    public Timestamp getLastUpdateDate() {
         return lastUpdateDate;
     }
 
@@ -72,7 +74,7 @@ public class Account {
         return type;
     }
 
-    public Account(int id, String name, double amount, LocalDate lastUpdateDate, int transactionsId, int currencyId, String type) {
+    public Account(int id, String name, double amount, Timestamp lastUpdateDate, int transactionsId, int currencyId, String type) {
         this.id = id;
         this.name = name;
         this.amount = amount;
