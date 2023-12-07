@@ -1,7 +1,6 @@
-package repository;
+package DAO;
 
 import JDBC.ConnectionDB;
-import models.Account;
 import models.Currency;
 
 import java.sql.Connection;
@@ -17,6 +16,7 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
     public CurrencyCrudOperations(ConnectionDB connectionDB) {
         this.connectionDB = connectionDB;
     }
+
 
     @Override
     public List<Currency> findAll() {

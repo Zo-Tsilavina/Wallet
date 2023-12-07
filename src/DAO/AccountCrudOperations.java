@@ -1,4 +1,4 @@
-package repository;
+package DAO;
 
 import JDBC.ConnectionDB;
 import models.Account;
@@ -11,10 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountCrudOperations implements CrudOperations<Account>{
-    private static ConnectionDB connectionDB;
+    private  ConnectionDB connectionDB;
+    private static final String accountsIdCol = "accounts_id";
+    private static  final String accountsNameCol = "name";
+    private static final String accountsCurrencyIdCol = "currency_id";
 
     public AccountCrudOperations() {
-        this.connectionDB = connectionDB;
+        this.connectionDB = new ConnectionDB();
     }
 
     @Override
@@ -25,11 +28,12 @@ public class AccountCrudOperations implements CrudOperations<Account>{
                 PreparedStatement statement= connection.prepareStatement("SELECT * FROM accounts");
                 ResultSet resultSet = statement.executeQuery()
         ){
+
           while (resultSet.next()){
               Account account = new Account(
-                      resultSet.getInt("account_id"),
-                      resultSet.getString("name"),
-                      resultSet.getInt("current_id")
+                      resultSet.getInt(accountsIdCol),
+                      resultSet.getString(accountsNameCol),
+                      resultSet.getInt(accountsCurrencyIdCol)
               );
               accounts.add(account);
           }
