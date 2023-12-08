@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS transaction;
-CREATE TABLE transaction(
+CREATE TABLE transactions(
      transaction_id SERIAL PRIMARY KEY,
      label VARCHAR(50),
      value DOUBLE PRECISION,
@@ -7,5 +7,5 @@ CREATE TABLE transaction(
      type_transaction VARCHAR(50)
 );
 
-INSERT INTO transaction (label, value, type_transaction) VALUES ('pret bancaire', 50, 'debit');
-INSERT INTO transaction (label, value, type_transaction) VALUES ('pret bancaire', 100,'credit');
+INSERT INTO transactions (label, value, type_transaction) VALUES ('pret bancaire', 50, 'debit');
+INSERT INTO transactions (label, value, type_transaction) VALUES ('pret bancaire', 100,'credit');

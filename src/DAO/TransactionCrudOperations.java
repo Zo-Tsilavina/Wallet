@@ -23,7 +23,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
         List<Transaction> transactions = new ArrayList<>();
         try (
                 Connection connection = connectionDB.getConnection();
-                PreparedStatement statement= connection.prepareStatement("SELECT * FROM transaction");
+                PreparedStatement statement= connection.prepareStatement("SELECT * FROM transactions");
                 ResultSet resultSet = statement.executeQuery()
         ){
             while (resultSet.next()){
@@ -35,6 +35,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
                         resultSet.getString("type_transaction")
                 );
                 transactions.add(transaction);
+                connection.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,7 +48,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM transaction WHERE label = ? AND value = ? AND date_time_transaction = ? AND type_transaction = ?"
+                        "SELECT * FROM transactions WHERE label = ? AND value = ? AND date_time_transaction = ? AND type_transaction = ?"
                 )
         ) {
             selectStatement.setString(1, transaction.getLabel());
@@ -58,7 +59,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
                     try (PreparedStatement updateStatement = connection.prepareStatement(
-                            "UPDATE transaction SET value = ?, date_time_transaction = ? WHERE label = ? AND type_transaction = ?"
+                            "UPDATE transactions SET value = ?, date_time_transaction = ? WHERE label = ? AND type_transaction = ?"
                     )) {
                         updateStatement.setDouble(1, transaction.getValue());
                         updateStatement.setTimestamp(2, transaction.getDateTimeTransaction());
@@ -69,7 +70,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
                     }
                 } else {
                     try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO transaction (label, value, date_time_transaction, type_transaction) VALUES (?, ?, ?, ?)"
+                            "INSERT INTO transactions (label, value, date_time_transaction, type_transaction) VALUES (?, ?, ?, ?)"
                     )) {
                         insertStatement.setString(1, transaction.getLabel());
                         insertStatement.setDouble(2, transaction.getValue());
@@ -80,6 +81,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
                         insertStatement.executeUpdate();
                     }
                 }
+                connection.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();

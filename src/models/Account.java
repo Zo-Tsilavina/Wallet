@@ -1,7 +1,7 @@
 package models;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.util.List;
 
 public class Account {
 
@@ -9,7 +9,7 @@ public class Account {
     private String name;
     private double amount;
     private Timestamp lastUpdateDate;
-    private int transactionsId;
+    private List<Integer> transactionsId;
     private int currencyId;
     private String type;
 
@@ -38,7 +38,7 @@ public class Account {
         this.lastUpdateDate = lastUpdateDate;
     }
 
-    public void setTransactionsId(int transactionsId) {
+    public void setTransactionsId(List<Integer> transactionsId) {
         this.transactionsId = transactionsId;
     }
 
@@ -62,7 +62,7 @@ public class Account {
         return lastUpdateDate;
     }
 
-    public int getTransactionsId() {
+    public List<Integer> getTransactionsId() {
         return transactionsId;
     }
 
@@ -74,7 +74,7 @@ public class Account {
         return type;
     }
 
-    public Account(int id, String name, double amount, Timestamp lastUpdateDate, int transactionsId, int currencyId, String type) {
+    public Account(int id, String name, double amount, Timestamp lastUpdateDate, List<Integer> transactionsId, int currencyId, String type) {
         this.id = id;
         this.name = name;
         this.amount = amount;

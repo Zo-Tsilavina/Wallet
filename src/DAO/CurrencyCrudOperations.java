@@ -23,7 +23,7 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
         List<Currency> currencies = new ArrayList<>();
         try (
                 Connection connection = connectionDB.getConnection();
-                PreparedStatement statement= connection.prepareStatement("SELECT * FROM currency");
+                PreparedStatement statement= connection.prepareStatement("SELECT * FROM currencies");
                 ResultSet resultSet = statement.executeQuery()
         ){
             while (resultSet.next()){
@@ -45,7 +45,7 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM currency WHERE name = ? AND code = ?"
+                        "SELECT * FROM currencies WHERE name = ? AND code = ?"
                 )
         ) {
             selectStatement.setString(1, currency.getName());
@@ -54,7 +54,7 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
                     try (PreparedStatement updateStatement = connection.prepareStatement(
-                            "UPDATE currency SET name = ?, code = ?"
+                            "UPDATE currencies SET name = ?, code = ?"
                     )) {
                         updateStatement.setString(1, currency.getName());
                         updateStatement.setString(2, currency.getCode());
@@ -63,7 +63,7 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
                     }
                 } else {
                     try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO currency (name, code) VALUES (?, ?)"
+                            "INSERT INTO currencies (name, code) VALUES (?, ?)"
                     )) {
                         insertStatement.setString(1, currency.getName());
                         insertStatement.setString(2, currency.getCode());
