@@ -1,6 +1,7 @@
 package DAO;
 
 import JDBC.ConnectionDB;
+import models.Currency;
 import models.Transaction;
 
 import java.sql.Connection;
@@ -41,6 +42,29 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
             e.printStackTrace();
         }
         return transactions;
+    }
+
+    @Override
+    public Transaction findById(int id) {
+        Transaction transaction = null;
+        try (Connection connection = connectionDB.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transactions WHERE transaction_id = ?");
+
+        ) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            transaction = new Transaction(
+                    resultSet.getInt("transaction_id"),
+                    resultSet.getString("label"),
+                    resultSet.getDouble("value"),
+                    resultSet.getTimestamp("date_time_transaction"),
+                    resultSet.getString("type_transaction")
+            );
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transaction;
     }
 
     @Override

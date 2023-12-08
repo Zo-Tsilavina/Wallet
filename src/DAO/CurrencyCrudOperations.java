@@ -10,7 +10,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CurrencyCrudOperations implements CrudOperations<Currency>{
     private ConnectionDB connectionDB;
@@ -38,6 +40,27 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
             e.printStackTrace();
         }
         return currencies;
+    }
+
+    @Override
+    public Currency findById(int id) {
+        Currency currency = null;
+        try (Connection connection = connectionDB.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM currencies WHERE currency_id = ?");
+
+        ) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+                resultSet.next();
+                currency = new Currency(
+                        resultSet.getInt("currency_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("code")
+                );
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return currency;
     }
 
     @Override

@@ -51,6 +51,37 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     }
 
     @Override
+    public Account findById(int id) {
+        Account account = null;
+        try (Connection connection = connectionDB.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM accounts WHERE account_id = ?");
+
+        ) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+                String transactionsId = resultSet.getString("transactions_id");
+                account = new Account(
+                        resultSet.getInt("account_id"),
+                        resultSet.getString("name"),
+                        resultSet.getDouble("amount"),
+                        resultSet.getTimestamp("last_update_date"),
+
+                        Arrays.stream(transactionsId.split(","))
+                                .map(Integer::parseInt)
+                                .collect(Collectors.toList()),
+
+                        resultSet.getInt("currency_id"),
+                        resultSet.getString("type")
+
+                );
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return account;
+    }
+
+    @Override
     public Account save(Account account) {
         try (
                 Connection connection = connectionDB.getConnection();
@@ -109,48 +140,48 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return account;
     }
 
-    public Account doTransaction (Transaction transaction, Account account){
-
-        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
-        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-
-        transactionCrudOperations.save(transaction);
-
-            if(transaction.getTypeTransaction().equals("debit")){
-                if((account.getAmount()-transaction.getValue() < 0)) {
-                    if (account.getType().equals("compte bancaire")) {
-                        account.setAmount(account.getAmount() - transaction.getValue());
-                        List<Integer> transactionIdList = account.getTransactionsId();
-                        transactionIdList.add(transaction.getId());
-                        account.setTransactionsId(transactionIdList);
-                        account.setLastUpdateDate(transaction.getDateTimeTransaction());
-                        accountCrudOperations.save(account);
-                    }else {
-                        System.out.println("solde insuffisant");
-                    }
-                }else {
-                    account.setAmount(account.getAmount() - transaction.getValue());
-                    List<Integer> transactionIdList = account.getTransactionsId();
-                    transactionIdList.add(transaction.getId());
-                    account.setTransactionsId(transactionIdList);
-                    account.setLastUpdateDate(transaction.getDateTimeTransaction());
-                    accountCrudOperations.save(account);
-                }
-
-            } else if (transaction.getTypeTransaction().equals("credit")) {
-
-                account.setAmount(account.getAmount() + transaction.getValue());
-                List<Integer> transactionIdList = account.getTransactionsId();
-                transactionIdList.add(transaction.getId());
-                account.setTransactionsId(transactionIdList);
-                account.setLastUpdateDate(transaction.getDateTimeTransaction());
-                accountCrudOperations.save(account);
-                return account;
-            }else{
-                System.out.println("invalid transaction type" );
-            }
-        return account;
-    }
+//    public Account doTransaction (Transaction transaction, Account account){
+//
+//        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+//        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+//
+//        transactionCrudOperations.save(transaction);
+//
+//            if(transaction.getTypeTransaction().equals("debit")){
+//                if((account.getAmount()-transaction.getValue() < 0)) {
+//                    if (account.getType().equals("compte bancaire")) {
+//                        account.setAmount(account.getAmount() - transaction.getValue());
+//                        List<Integer> transactionIdList = account.getTransactionsId();
+//                        transactionIdList.add(transaction.getId());
+//                        account.setTransactionsId(transactionIdList);
+//                        account.setLastUpdateDate(transaction.getDateTimeTransaction());
+//                        accountCrudOperations.save(account);
+//                    }else {
+//                        System.out.println("solde insuffisant");
+//                    }
+//                }else {
+//                    account.setAmount(account.getAmount() - transaction.getValue());
+//                    List<Integer> transactionIdList = account.getTransactionsId();
+//                    transactionIdList.add(transaction.getId());
+//                    account.setTransactionsId(transactionIdList);
+//                    account.setLastUpdateDate(transaction.getDateTimeTransaction());
+//                    accountCrudOperations.save(account);
+//                }
+//
+//            } else if (transaction.getTypeTransaction().equals("credit")) {
+//
+//                account.setAmount(account.getAmount() + transaction.getValue());
+//                List<Integer> transactionIdList = account.getTransactionsId();
+//                transactionIdList.add(transaction.getId());
+//                account.setTransactionsId(transactionIdList);
+//                account.setLastUpdateDate(transaction.getDateTimeTransaction());
+//                accountCrudOperations.save(account);
+//                return account;
+//            }else{
+//                System.out.println("invalid transaction type" );
+//            }
+//        return account;
+//    }
 //    public Account getAccountBalance (Timestamp timestamp){
 //        List<Transaction> transactionList = new ArrayList<>();
 //
