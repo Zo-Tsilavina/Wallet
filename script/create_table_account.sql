@@ -8,6 +8,3 @@ CREATE TABLE accounts(
      currency_id int REFERENCES currencies(currency_id),
      type VARCHAR(50)
 );
-
-INSERT INTO accounts (name, amount, transactions_id, currency_id, type) VALUES ('compte courant', 500, 1, 1, 'Bank');
-INSERT INTO accounts (name, amount, transactions_id, currency_id, type) VALUES ('compte epargne', 200, 2, 2, 'Mobile money');

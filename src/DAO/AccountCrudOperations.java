@@ -140,57 +140,75 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return account;
     }
 
-//    public Account doTransaction (Transaction transaction, Account account){
-//
-//        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
-//        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-//
-//        transactionCrudOperations.save(transaction);
-//
-//            if(transaction.getTypeTransaction().equals("debit")){
-//                if((account.getAmount()-transaction.getValue() < 0)) {
-//                    if (account.getType().equals("compte bancaire")) {
-//                        account.setAmount(account.getAmount() - transaction.getValue());
-//                        List<Integer> transactionIdList = account.getTransactionsId();
-//                        transactionIdList.add(transaction.getId());
-//                        account.setTransactionsId(transactionIdList);
-//                        account.setLastUpdateDate(transaction.getDateTimeTransaction());
-//                        accountCrudOperations.save(account);
-//                    }else {
-//                        System.out.println("solde insuffisant");
-//                    }
-//                }else {
-//                    account.setAmount(account.getAmount() - transaction.getValue());
-//                    List<Integer> transactionIdList = account.getTransactionsId();
-//                    transactionIdList.add(transaction.getId());
-//                    account.setTransactionsId(transactionIdList);
-//                    account.setLastUpdateDate(transaction.getDateTimeTransaction());
-//                    accountCrudOperations.save(account);
-//                }
-//
-//            } else if (transaction.getTypeTransaction().equals("credit")) {
-//
-//                account.setAmount(account.getAmount() + transaction.getValue());
-//                List<Integer> transactionIdList = account.getTransactionsId();
-//                transactionIdList.add(transaction.getId());
-//                account.setTransactionsId(transactionIdList);
-//                account.setLastUpdateDate(transaction.getDateTimeTransaction());
-//                accountCrudOperations.save(account);
-//                return account;
-//            }else{
-//                System.out.println("invalid transaction type" );
-//            }
-//        return account;
-//    }
-//    public Account getAccountBalance (Timestamp timestamp){
-//        List<Transaction> transactionList = new ArrayList<>();
-//
-////        recuperer le compte concerner
-////        recuperer tout les transaction lie compte conserner a partir de idTransaction
-////        prendre le solde actuel du compte en question
-////        remonter le solde jusqu'a la date donner c.a.d (+) pour debit et (-) pour credit
-//
-//    }
+    public Account getAccountBalance (Timestamp timestamp, Account account){
+
+//        recuperer tout les transaction lie compte concerner a partir de idTransaction
+//        prendre le solde actuel du compte en question
+//        remonter le solde jusqu'a la date donner c.a.d (+) pour debit et (-) pour credit
+
+        List<Integer> transactionIdList = account.getTransactionsId();
+        for (int i = 0; i < transactionIdList.size(); i++) {
+            int transactionId = transactionIdList.get(i);
+            TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+            Transaction currentTransaction = transactionCrudOperations.findById(transactionId);
+            Timestamp currentTransactionTimestamp = currentTransaction.getDateTimeTransaction();
+            if (timestamp.after(currentTransactionTimestamp) || timestamp.equals(currentTransactionTimestamp)){
+                if (currentTransaction.getTypeTransaction().equals("credit")) {
+                    account.setAmount(account.getAmount() + currentTransaction.getValue());
+                    account.setLastUpdateDate(currentTransactionTimestamp);
+                } else if (currentTransaction.getTypeTransaction().equals("debit")) {
+                    account.setAmount(account.getAmount() - currentTransaction.getValue());
+                    account.setLastUpdateDate(currentTransactionTimestamp);
+                }
+            } else {
+                break;
+            }
+        }
+        return account;
+    }
+
+    public Account doTransaction (Transaction transaction, Account account){
+
+        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+
+        transactionCrudOperations.save(transaction);
+
+            if(transaction.getTypeTransaction().equals("debit")){
+                if((account.getAmount()-transaction.getValue() < 0)) {
+                    if (account.getType().equals("compte bancaire")) {
+                        account.setAmount(account.getAmount() - transaction.getValue());
+                        List<Integer> transactionIdList = account.getTransactionsId();
+                        transactionIdList.add(transaction.getId());
+                        account.setTransactionsId(transactionIdList);
+                        account.setLastUpdateDate(transaction.getDateTimeTransaction());
+                        accountCrudOperations.save(account);
+                    }else {
+                        System.out.println("solde insuffisant");
+                    }
+                }else {
+                    account.setAmount(account.getAmount() - transaction.getValue());
+                    List<Integer> transactionIdList = account.getTransactionsId();
+                    transactionIdList.add(transaction.getId());
+                    account.setTransactionsId(transactionIdList);
+                    account.setLastUpdateDate(transaction.getDateTimeTransaction());
+                    accountCrudOperations.save(account);
+                }
+
+            } else if (transaction.getTypeTransaction().equals("credit")) {
+
+                account.setAmount(account.getAmount() + transaction.getValue());
+                List<Integer> transactionIdList = account.getTransactionsId();
+                transactionIdList.add(transaction.getId());
+                account.setTransactionsId(transactionIdList);
+                account.setLastUpdateDate(transaction.getDateTimeTransaction());
+                accountCrudOperations.save(account);
+                return account;
+            }else{
+                System.out.println("invalid transaction type" );
+            }
+        return account;
+    }
 //    public List<Account> getAccountBalanceHistory (Timestamp startDate, Timestamp endDate, Account account){
 //
 ////          recuperer le solde a la date startDate a l'aide de getAccountBalance

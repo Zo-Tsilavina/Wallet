@@ -12,48 +12,23 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-//         TEST FOR ACCOUNT CRUD OPERATIONS
-//        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-//        System.out.println(accountCrudOperations.findById(2));
-//
-//        List<Integer> transactionsId = new ArrayList<>();
-//        transactionsId.add(1);
-//
-//        Account test = new Account(
-//                2,
-//                "Junka",
-//                15500.00,
-//                Timestamp.valueOf("2025-05-06 08:30:00"),
-//                transactionsId,
-//                1,
-//                "compte bancaire"
-//        );
+        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+        List<Integer> transactionsId = new ArrayList<>();
+        transactionsId.add(1);
+        transactionsId.add(2);
+        transactionsId.add(3);
+        Account test = new Account(
+                1,
+                "tsilavina",
+                0.00,
+                Timestamp.valueOf("2023-07-03 12:30:21"),
+                transactionsId,
+                1,
+                "espece"
+        );
+//        System.out.println(accountCrudOperations.save(test));
+        Timestamp timestamp = Timestamp.valueOf("2023-12-06 04:00:00");
 
-////        System.out.println(accountCrudOperations.save(test));
-//            System.out.println(accountCrudOperations.findAll());
-//        TEST FOR CURRENCY CRUD OPERATIONS
-//        CurrencyCrudOperations currencyCrudOperations = new CurrencyCrudOperations();
-//        System.out.println(currencyCrudOperations.findById(1));
-//        System.out.println(currencyCrudOperations.findAll());
-//        Currency test = new Currency(
-//                3,
-//                "Yen",
-//                "JPY"
-//        );
-//        System.out.println(currencyCrudOperations.save(test));
-
-        // TEST FOR TRANSACTION CRUD OPERATIONS
-        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
-        System.out.println(transactionCrudOperations.findById(1));
-//        System.out.println(transactionCrudOperations.findAll());
-//        Transaction transaction = new Transaction(
-//                15,
-//                "pret bancaire",
-//                16500.00,
-//                Timestamp.valueOf("2025-06-07 08:30:00"),
-//                "debit"
-//        );
-//        System.out.println(transactionCrudOperations.save(transaction));
-//        System.out.println(accountCrudOperations.doTransaction(transaction, test));
+        System.out.println(accountCrudOperations.getAccountBalance(timestamp, test));
     }
 }
