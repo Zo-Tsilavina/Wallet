@@ -27,8 +27,8 @@ public class Main {
                 "espece"
         );
 //        System.out.println(accountCrudOperations.save(test));
-        Timestamp startDate = Timestamp.valueOf("2019-12-06 04:00:00");
-        Timestamp endDate = Timestamp.valueOf("2025-12-03 05:50:00");
+        Timestamp startDate = Timestamp.valueOf("2023-12-01 01:00:00");
+        Timestamp endDate = Timestamp.valueOf("2023-12-06 04:50:00");
 
         System.out.println(accountCrudOperations.getAccountBalanceHistory(startDate, endDate, test));
     }

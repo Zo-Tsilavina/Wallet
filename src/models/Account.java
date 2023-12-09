@@ -2,15 +2,16 @@ package models;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 
 public class Account {
 
-    private int id;
+    private final int id;
     private String name;
     private double amount;
     private Timestamp lastUpdateDate;
     private List<Integer> transactionsId;
-    private int currencyId;
+    private final int currencyId;
     private String type;
 
     @Override
@@ -46,6 +47,19 @@ public class Account {
         this.type = type;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return id == account.id && Double.compare(account.amount, amount) == 0 && currencyId == account.currencyId && Objects.equals(name, account.name) && Objects.equals(lastUpdateDate, account.lastUpdateDate) && Objects.equals(transactionsId, account.transactionsId) && Objects.equals(type, account.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, amount, lastUpdateDate, transactionsId, currencyId, type);
+    }
+
     public int getId() {
         return id;
     }
@@ -65,7 +79,6 @@ public class Account {
     public List<Integer> getTransactionsId() {
         return transactionsId;
     }
-
     public int getCurrencyId() {
         return currencyId;
     }

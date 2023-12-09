@@ -185,19 +185,24 @@ public class AccountCrudOperations implements CrudOperations<Account> {
 
     public Account getAccountBalance (Timestamp timestamp, Account account){
 
+        List<Integer> currentTransactionIdList = new ArrayList<>();
         List<Integer> transactionIdList = account.getTransactionsId();
-        for (int i = 0; i < transactionIdList.size(); i++) {
-            int transactionId = transactionIdList.get(i);
+
+        for (int transactionId : transactionIdList) {
+            currentTransactionIdList.add(transactionId);
             TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
             Transaction currentTransaction = transactionCrudOperations.findById(transactionId);
             Timestamp currentTransactionTimestamp = currentTransaction.getDateTimeTransaction();
-            if (timestamp.after(currentTransactionTimestamp) || timestamp.equals(currentTransactionTimestamp)){
+            if (timestamp.after(currentTransactionTimestamp) || timestamp.equals(currentTransactionTimestamp)) {
+
                 if (currentTransaction.getTypeTransaction().equals("credit")) {
                     account.setAmount(account.getAmount() + currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
+                    account.setTransactionsId(currentTransactionIdList);
                 } else if (currentTransaction.getTypeTransaction().equals("debit")) {
                     account.setAmount(account.getAmount() - currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
+                    account.setTransactionsId(currentTransactionIdList);
                 }
             } else {
                 break;
@@ -211,33 +216,58 @@ public class AccountCrudOperations implements CrudOperations<Account> {
 //          recuperer le solde a la date startDate a l'aide de getAccountBalance
 //          recuperer toute les transactions lie a ce compte durant le periode defini
 //          recuperer le solde du compte a chaque transaction durant cette periode
+
         List<Account> accounts = new ArrayList<>();
         List<Integer> transactionIdList = account.getTransactionsId();
         List<Integer> currentTransactionIdList = new ArrayList<>();
 
-        for (int i = 0; i < transactionIdList.size(); i++) {
-
-            int transactionId = transactionIdList.get(i);
+        for (int transactionId : transactionIdList) {
 
             TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
             Transaction currentTransaction = transactionCrudOperations.findById(transactionId);
             Timestamp currentTransactionTimestamp = currentTransaction.getDateTimeTransaction();
 
             currentTransactionIdList.add(transactionId);
+            if (currentTransactionTimestamp.before(startDate)){
 
-            if (startDate.before(currentTransactionTimestamp) && endDate.after(currentTransactionTimestamp)){
+                if (currentTransaction.getTypeTransaction().equals("credit")) {
+
+                    account.setAmount(account.getAmount() + currentTransaction.getValue());
+                    account.setLastUpdateDate(currentTransactionTimestamp);
+                    account.setTransactionsId(currentTransactionIdList);
+
+                } else if (currentTransaction.getTypeTransaction().equals("debit")) {
+
+                    account.setAmount(account.getAmount() - currentTransaction.getValue());
+                    account.setLastUpdateDate(currentTransactionTimestamp);
+                    account.setTransactionsId(currentTransactionIdList);
+                }
+
+            }else if ((startDate.before(currentTransactionTimestamp) || startDate.equals(currentTransactionTimestamp))
+                    && (endDate.after(currentTransactionTimestamp) || endDate.equals(currentTransactionTimestamp))) {
+
                 if (currentTransaction.getTypeTransaction().equals("credit")) {
                     account.setAmount(account.getAmount() + currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
                     account.setTransactionsId(currentTransactionIdList);
-                    accounts.add(account);
                 } else if (currentTransaction.getTypeTransaction().equals("debit")) {
+
                     account.setAmount(account.getAmount() - currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
                     account.setTransactionsId(currentTransactionIdList);
-                    accounts.add(account);
                 }
-            }else {
+                Account accountToShow = new Account(
+                        account.getId(),
+                        account.getName(),
+                        account.getAmount(),
+                        account.getLastUpdateDate(),
+                        account.getTransactionsId(),
+                        account.getCurrencyId(),
+                        account.getType()
+                );
+                accounts.add(accountToShow);
+            } else {
+                System.out.println("no transaction from "+ startDate + " to "+ endDate);
                 break;
             }
         }
