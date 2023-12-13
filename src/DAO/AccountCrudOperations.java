@@ -5,6 +5,7 @@ import models.Account;
 import models.Transaction;
 
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -145,41 +146,33 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
 
-        transactionCrudOperations.save(transaction);
-
             if(transaction.getTypeTransaction().equals("debit")){
                 if((account.getAmount()-transaction.getValue() < 0)) {
                     if (account.getType().equals("compte bancaire")) {
                         account.setAmount(account.getAmount() - transaction.getValue());
-                        List<Integer> transactionIdList = account.getTransactionsId();
-                        transactionIdList.add(transaction.getId());
-                        account.setTransactionsId(transactionIdList);
-                        account.setLastUpdateDate(transaction.getDateTimeTransaction());
-                        accountCrudOperations.save(account);
+
                     }else {
-                        System.out.println("solde insuffisant");
+                        throw new RuntimeException("transaction failed, solde insufisante");
                     }
+
                 }else {
                     account.setAmount(account.getAmount() - transaction.getValue());
-                    List<Integer> transactionIdList = account.getTransactionsId();
-                    transactionIdList.add(transaction.getId());
-                    account.setTransactionsId(transactionIdList);
-                    account.setLastUpdateDate(transaction.getDateTimeTransaction());
-                    accountCrudOperations.save(account);
                 }
 
             } else if (transaction.getTypeTransaction().equals("credit")) {
-
                 account.setAmount(account.getAmount() + transaction.getValue());
-                List<Integer> transactionIdList = account.getTransactionsId();
-                transactionIdList.add(transaction.getId());
-                account.setTransactionsId(transactionIdList);
-                account.setLastUpdateDate(transaction.getDateTimeTransaction());
-                accountCrudOperations.save(account);
-                return account;
+
             }else{
-                System.out.println("invalid transaction type" );
+                throw new RuntimeException("transaction failed");
             }
+
+        List<Integer> transactionIdList = account.getTransactionsId();
+        transactionIdList.add(transaction.getId());
+        account.setTransactionsId(transactionIdList);
+        account.setLastUpdateDate(transaction.getDateTimeTransaction());
+        accountCrudOperations.save(account);
+        transactionCrudOperations.save(transaction);
+
         return account;
     }
 
@@ -274,20 +267,54 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return accounts;
 
     }
-//    public List<Account> transfert (Account crediteur , Account debiteur){
+    public List<Account> transfer (Account creditor , Account debtor, double amount) {
+
+        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+
+        int creditorCurrencyId = creditor.getCurrencyId();
+        int debtorCurrencyId = debtor.getCurrencyId();
+
+        if (creditor.equals(debtor)) {
+
+            throw new RuntimeException();
+
+        } else if (creditorCurrencyId == debtorCurrencyId) {
+
+            Transaction transactionCreditor = new Transaction(
+                    5,
+                    "transfer",
+                    amount,
+                    Timestamp.valueOf(String.valueOf(Instant.now())),
+                    "debit"
+            );
+            accountCrudOperations.doTransaction(transactionCreditor, creditor);
+
+            Transaction transactionDebtor = new Transaction(
+                    5,
+                    "transfer",
+                    amount,
+                    Timestamp.valueOf(String.valueOf(Instant.now())),
+                    "credit"
+            );
+            accountCrudOperations.doTransaction(transactionDebtor, debtor);
+
+        } else {
+
+        }
+//            verifier si ce n est pas le meme :
+//                - si oui : le transfert ne peut pas avoir lieu
+//                - sinon:
+//                    verifier si les deux comptes ont le meme devise
+//                        -si oui:
+//                            cree une nouvelle transaction pour chaque compte
+//                                (type debit pour le creditor et de type credit pour l'autre)
+//                            effectuer un doTransaction() pour chaque compte pour mettre a jour leur solde
 //
-////            verifier si ce n est pas le meme :
-////                - si oui : le transfert ne peut pas avoir lieu
-////                - sinon:
-////                    verifier si les deux comptes ont le meme devise
-////                        -si oui:
-////                            cree une nouvelle transaction pour chaque compte
-////                                (type debit pour le crediteur et de type credit pour l'autre)
-////                            effectuer un doTransaction() pour chaque compte pour mettre a jour leur solde
-////
-////                                    pour la fonction pour l'historique :
-////                                         ... (cree l'entity d'abord)
-////                        -si non:
-////
-//    }
+//                                    pour la fonction pour l'historique :
+//                                         ... (cree l'entity d'abord)
+//                        -si non:
+
+        return null;
+    }
 }
