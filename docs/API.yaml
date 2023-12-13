@@ -1,15 +1,19 @@
 openapi: 3.0.3
 info:
-  version: "1.0.0 "
   title: "Wallet API"
-  servers:
+  version: 1.3.0
+  description: STD22083 - STD22065
+servers:
     - url: "http://wallet.binome"
 paths:
   /accounts:
     get:
-      summary: "List all accounts"
+      tags:
+          - accounts
+      summary: List all accounts
+      description: return all existing accounts
+      operationId: getAccounts 
       responses:
-        responses:
           200:
             description: The list of all accounts
             content:
@@ -18,86 +22,34 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/Account'
-            400:
+          400:
               $ref: '#/components/responses/400'
-            403:
+          403:
               $ref: '#/components/responses/403'
-            500:
+          500:
               $ref: '#/components/responses/500'
+    
     post:
-      summary: "Create a new account"
-      200:
-        description: Account created successfully
-        parameters:
-          - name: "Account"
-            in: "body"
-            required: true
+      tags:
+        - accounts
+      summary: "Save accounts"
+      operationId: SaveAccounts
+      requestBody:
+        content:
+          application/json:
             schema:
-              $ref: "#/components/schemas/Account"
-      400:
-        $ref: '#/components/responses/400'
-      403:
-        $ref: '#/components/responses/403'
-      500:
-        $ref: '#/components/responses/500'
-
-  /accounts/{accountId}:
-    put:
-      summary: "Update account details by ID"
-      parameters:
-        - name: "accountId"
-          in: "path"
-          required: true
-          type: "integer"
-        - name: "account"
-          in: "body"
-          required: true
-          schema:
-            $ref: "#/components/schemas/Account"
+              type: array
+              items:
+                $ref: "#/components/schemas/Account"
       responses:
         200:
-          description: Account updated successfully
+          description: The list of created or updated accounts
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Account'
-          400:
-            $ref: '#/components/responses/400'
-          403:
-            $ref: '#/components/responses/403'
-          500:
-            $ref: '#/components/responses/500'
-  /transactions:
-    get:
-      summary: "List all transactions"
-      responses:
-        200:
-          description: The list of all transactions
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Transaction'
-          400:
-            $ref: '#/components/responses/400'
-          403:
-            $ref: '#/components/responses/403'
-          500:
-            $ref: '#/components/responses/500'
-    post:
-      summary: "Create a new transaction"
-      responses:
-        200:
-          description: Transaction created successfully
-          parameters:
-            - name: "transaction"
-              in: "body"
-              required: true
-              schema:
-                $ref: "#/components/schemas/Transaction"
         400:
           $ref: '#/components/responses/400'
         403:
@@ -105,38 +57,118 @@ paths:
         500:
           $ref: '#/components/responses/500'
 
-
-  /transactions/{transactionId}:
-    put:
-      summary: "Update transaction details by ID"
+  /accounts/{accountId}:
+    get:
+      tags:
+        - accounts
+      summary: get account by id
+      description: find an account by a given id
+      operationId: getAccounts
       parameters:
-        - name: "transactionId"
-          in: "path"
-          required: true
-          type: "integer"
-        - name: "transaction"
-          in: "body"
+        - name: accountId
+          in: path
           required: true
           schema:
-            $ref: "#/components/schemas/Transaction"
+            type: integer
       responses:
         200:
-          description: Transactions updated successfully
+          description: the account owner of the given id
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Account'
+        400:
+          $ref: '#/components/responses/400'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+
+  /transactions:
+    get:
+      tags:
+          - transactions
+      summary: List all transactions
+      description: return all existing transactions
+      operationId: getTransactions
+      responses:
+          200:
+            description: The list of all transactions
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Transaction'
+          400:
+              $ref: '#/components/responses/400'
+          403:
+              $ref: '#/components/responses/403'
+          500:
+              $ref: '#/components/responses/500'
+    
+    post:
+      tags:
+        - transactions
+      summary: "Save transactions"
+      operationId: saveTransactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Transaction"
+      responses:
+        200:
+          description: The list of created or updated transactions
+          content:
+            application/json:
+              schema:
+                type: array
                 items:
                   $ref: '#/components/schemas/Transaction'
-          400:
-            $ref: '#/components/responses/400'
-          403:
-            $ref: '#/components/responses/403'
-          500:
-            $ref: '#/components/responses/500'
+        400:
+          $ref: '#/components/responses/400'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+
+  /transactions/{transactionId}:
+    get:
+      tags:
+        - transactions
+      summary: get transaction by id
+      description: find an transaction by a given id
+      operationId: getTransaction
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: the transaction owner of the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        400:
+          $ref: '#/components/responses/400'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+          
   /currencies:
     get:
-      summary: "List all currencies"
+      tags:
+        - currencies
+      summary: List all currencies
+      description: return all existing currencies
+      operationId: getcurrencies
       responses:
         200:
           description: The list of all currencies
@@ -146,29 +178,144 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Currency'
-          400:
-            $ref: '#/components/responses/400'
-          403:
-            $ref: '#/components/responses/403'
-          500:
-            $ref: '#/components/responses/500'
-    post:
-      summary: "Create a new currency"
-      responses:
-        200:
-          description: Currency created successfully
-          parameters:
-            - name: "Currency"
-              in: "body"
-              required: true
-              schema:
-                $ref: "#/components/schemas/currency"
         400:
           $ref: '#/components/responses/400'
         403:
           $ref: '#/components/responses/403'
         500:
           $ref: '#/components/responses/500'
+    post:
+      tags:
+        - currencies
+      summary: "Save currencies"
+      operationId: savecurrencies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Currency"
+      responses:
+        200:
+          description: The list of created or updated currencies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Currency'
+        400:
+          $ref: '#/components/responses/400'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+
+  /currencies/{CurrencyId}:
+    get:
+      tags:
+        - currencies
+      summary: get Currency by id
+      description: find an Currency by a given id
+      operationId: getCurrency
+      parameters:
+        - name: CurrencyId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: the Currency owner of the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+        400:
+          $ref: '#/components/responses/400'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+
+  /transferHistory:
+    get:
+      tags:
+        - transferHistory
+      summary: List all transferHistory
+      description: return all existing transferHistory
+      operationId: getTransferHistory
+      responses:
+        200:
+          description: The list of all transferHistory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransferHistory'
+        400:
+          $ref: '#/components/responses/400'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+    post:
+      tags:
+        - transferHistory
+      summary: "Save transferHistory"
+      operationId: saveTransferHistory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/TransferHistory"
+      responses:
+        200:
+          description: The list of created or updated transferHistory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransferHistory'
+        400:
+          $ref: '#/components/responses/400'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+
+  /transferHistory/{TransferHistoryId}:
+    get:
+      tags:
+        - transferHistory
+      summary: get TransferHistory by id
+      description: find an TransferHistory by a given id
+      operationId: getTransferHistory
+      parameters:
+        - name: TransferHistoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: the TransferHistory owner of the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferHistory'
+        400:
+          $ref: '#/components/responses/400'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+          
 components:
   responses:
     400:
@@ -219,37 +366,56 @@ components:
         properties:
           id:
             type: integer
-          accountName:
+          name:
             type: string
-          currencyId:
-            - $ref: "#/components/schemas/Currency"
-          topic:
+          amount:
+            type: number
+          lastUpdateDate:
             type: string
-            enum:
-              - ROMANCE
-              - COMEDY
-              - OTHER
+            format: date
+          transactionId:
+            type: array
+            items: 
+              type: integer
+          CurrencyId:
+            type: integer
+          type: 
+            type: string
+
       Currency:
           type: object
           properties:
               id:
                 type: integer
-              currencyName:
+              name:
                 type: string
-              symbol:
+              code:
                 type: string
+
       Transaction:
           type: object
           properties:
               id:
                 type: integer
+              label:
+                type: string
               value:
-                type: double
-              description:
+                type: number
+              dateTimeTransaction:
                 type: string
-              accountId:
-                - $ref: "#/components/schemas/Account"
-              type:
+                format: date
+              typeTransaction:
                 type: string
-              transactionDate:
-                type: date
+
+      TransferHistory:
+          type: object
+          properties:
+              id:
+                type: integer
+              debtorTransactionId:
+                type: integer
+              creditorTransactionId:
+                type: integer
+              transferDate:
+                type: string
+                format: date
