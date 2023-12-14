@@ -5,7 +5,12 @@ import models.Account;
 import models.Currency;
 import models.Transaction;
 
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,23 +18,29 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-        List<Integer> transactionsId = new ArrayList<>();
-        transactionsId.add(1);
-        transactionsId.add(2);
-        transactionsId.add(3);
-        Account test = new Account(
-                1,
-                "tsilavina",
-                0.00,
-                Timestamp.valueOf("2023-07-03 12:30:21"),
-                transactionsId,
-                1,
-                "espece"
-        );
-//        System.out.println(accountCrudOperations.save(test));
-        Timestamp startDate = Timestamp.valueOf("2023-12-01 01:00:00");
-        Timestamp endDate = Timestamp.valueOf("2023-12-06 04:50:00");
-
-        System.out.println(accountCrudOperations.getAccountBalanceHistory(startDate, endDate, test));
+//        List<Integer> transaction = new ArrayList<>();
+//        Instant instant = Instant.now();
+//        Timestamp timestamp = Timestamp.from(instant);
+//        Account debtor = new Account(
+//            3,
+//            "tsila",
+//            500.00,
+//            timestamp,
+//                transaction,
+//                2,
+//                "compte bancaire"
+//        );
+//
+//        Account creditor = new Account(
+//                3,
+//                "junka",
+//                500.00,
+//                timestamp,
+//                transaction,
+//                2,
+//                "compte epargne"
+//        );
+//        System.out.println(accountCrudOperations.transfer(creditor, debtor, 500.00));
     }
+
 }

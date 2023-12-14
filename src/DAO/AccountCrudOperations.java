@@ -274,6 +274,9 @@ public class AccountCrudOperations implements CrudOperations<Account> {
 
         int creditorCurrencyId = creditor.getCurrencyId();
         int debtorCurrencyId = debtor.getCurrencyId();
+        int randomNumber = (int) Math.random();
+        Instant instant = Instant.now();
+        Timestamp timestamp = Timestamp.from(instant);
 
         if (creditor.equals(debtor)) {
 
@@ -282,24 +285,22 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         } else if (creditorCurrencyId == debtorCurrencyId) {
 
             Transaction transactionCreditor = new Transaction(
-                    5,
+                    randomNumber,
                     "transfer",
                     amount,
-                    Timestamp.valueOf(String.valueOf(Instant.now())),
+                    timestamp,
                     "debit"
             );
             accountCrudOperations.doTransaction(transactionCreditor, creditor);
 
             Transaction transactionDebtor = new Transaction(
-                    5,
+                    randomNumber,
                     "transfer",
                     amount,
-                    Timestamp.valueOf(String.valueOf(Instant.now())),
+                    timestamp,
                     "credit"
             );
             accountCrudOperations.doTransaction(transactionDebtor, debtor);
-
-        } else {
 
         }
 //            verifier si ce n est pas le meme :
@@ -314,7 +315,6 @@ public class AccountCrudOperations implements CrudOperations<Account> {
 //                                    pour la fonction pour l'historique :
 //                                         ... (cree l'entity d'abord)
 //                        -si non:
-
         return null;
     }
 }
