@@ -205,12 +205,6 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return account;
     }
 
-    public Account getActualAccountBalance (Account account){
-        Timestamp now = Timestamp.valueOf(String.valueOf(Instant.now()));
-
-        return getAccountBalance(now, account);
-    }
-
     public List<Account> getAccountBalanceHistory (Timestamp startDate, Timestamp endDate, Account account){
 
 //          recuperer le solde a la date startDate a l'aide de getAccountBalance
@@ -277,10 +271,13 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     public List<Account> transfer (Account creditor , Account debtor, double amount) {
 
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-        TransferHistoryCrudOperations transferHistoryCrudOperations = new TransferHistoryCrudOperations();
+        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
 
         int creditorCurrencyId = creditor.getCurrencyId();
         int debtorCurrencyId = debtor.getCurrencyId();
+        int randomNumber = (int) Math.random();
+        Instant instant = Instant.now();
+        Timestamp timestamp = Timestamp.from(instant);
 
         if (creditor.equals(debtor)) {
 
@@ -289,7 +286,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         } else if (creditorCurrencyId == debtorCurrencyId) {
 
             Transaction transactionCreditor = new Transaction(
-                    1,
+                    randomNumber,
                     "transfer",
                     amount,
                     Timestamp.valueOf(String.valueOf(Instant.now())),
@@ -298,24 +295,13 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             accountCrudOperations.doTransaction(transactionCreditor, creditor);
 
             Transaction transactionDebtor = new Transaction(
-                    1,
+                    randomNumber,
                     "transfer",
                     amount,
-                    Timestamp.valueOf(String.valueOf(Instant.now())),
+                    timestamp,
                     "credit"
             );
             accountCrudOperations.doTransaction(transactionDebtor, debtor);
-
-            TransferHistory transferHistory = new TransferHistory(
-                    1,
-                    transactionDebtor.getId(),
-                    transactionCreditor.getId(),
-                    transactionCreditor.getDateTimeTransaction()
-            );
-
-            transferHistoryCrudOperations.save(transferHistory);
-
-        }else {
 
         }
 //            verifier si ce n est pas le meme :
@@ -330,7 +316,6 @@ public class AccountCrudOperations implements CrudOperations<Account> {
 //                                    pour la fonction pour l'historique :
 //                                         ... (cree l'entity d'abord)
 //                        -si non:
-
         return null;
     }
     public List<TransferHistory> getTransferHistories (Timestamp startDate, Timestamp endDate){
@@ -352,31 +337,31 @@ public class AccountCrudOperations implements CrudOperations<Account> {
 
                 TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
 
-            Account accountDebtor = (Account) allAccount.stream().filter(account -> {
-                int debtorTransactionId = transferHistory.getDebtorTransactionId();
+                Account accountDebtor = (Account) allAccount.stream().filter(account -> {
+                    int debtorTransactionId = transferHistory.getDebtorTransactionId();
 
-                return account.getTransactionsId().contains(debtorTransactionId);
-            });
+                    return account.getTransactionsId().contains(debtorTransactionId);
+                });
 
-            Account accountCreditor = (Account) allAccount.stream().filter(account -> {
-                int creditorTransactionId = transferHistory.getCreditorTransactionId();
+                Account accountCreditor = (Account) allAccount.stream().filter(account -> {
+                    int creditorTransactionId = transferHistory.getCreditorTransactionId();
 
-                return account.getTransactionsId().contains(creditorTransactionId);
-            });
+                    return account.getTransactionsId().contains(creditorTransactionId);
+                });
 
-            Double transferAmount = transactionCrudOperations.findById(transferHistory.getCreditorTransactionId()).getValue();
+                Double transferAmount = transactionCrudOperations.findById(transferHistory.getCreditorTransactionId()).getValue();
 
-            Timestamp transferDate = transferHistory.getTransferDate();
+                Timestamp transferDate = transferHistory.getTransferDate();
 
-            System.out.println(
-                    "i) Le compte débiteur: "+ accountDebtor +
+                System.out.println(
+                        "i) Le compte débiteur: "+ accountDebtor +
 
-                "\n ii) Le compte créditeur: "+ accountCreditor +
+                                "\n ii) Le compte créditeur: "+ accountCreditor +
 
-                "\n iii) Le montant du transfert"+ transferAmount +
+                                "\n iii) Le montant du transfert"+ transferAmount +
 
-                "\n iv) La date du transfert"+ transferDate
-            );
+                                "\n iv) La date du transfert"+ transferDate
+                );
                 periodTransferHistories.add(transferHistory);
             }
         });
