@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS accounts;
 CREATE TABLE accounts(
-     account_id SERIAL PRIMARY KEY,
+     account_id INT PRIMARY KEY,
      name VARCHAR(150),
      amount DOUBLE PRECISION,
      last_update_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

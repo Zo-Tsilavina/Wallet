@@ -8,14 +8,30 @@ public class Transaction {
     private String label;
     private Double value;
     private Timestamp dateTimeTransaction;
-    private String typeTransaction;
+    private int transactionCategoryId;
 
-    public Transaction(int id, String label, Double value, Timestamp dateTimeTransaction, String typeTransaction) {
-        this.id = id;
-        this.label = label;
-        this.value = value;
-        this.dateTimeTransaction = dateTimeTransaction;
-        this.typeTransaction = typeTransaction;
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", label='" + label + '\'' +
+                ", value=" + value +
+                ", dateTimeTransaction=" + dateTimeTransaction +
+                ", transactionCategoryId=" + transactionCategoryId +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return id == that.id && transactionCategoryId == that.transactionCategoryId && Objects.equals(label, that.label) && Objects.equals(value, that.value) && Objects.equals(dateTimeTransaction, that.dateTimeTransaction);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, label, value, dateTimeTransaction, transactionCategoryId);
     }
 
     public int getId() {
@@ -50,35 +66,19 @@ public class Transaction {
         this.dateTimeTransaction = dateTimeTransaction;
     }
 
-    public String getTypeTransaction() {
-        return typeTransaction;
+    public int getTransactionCategoryId() {
+        return transactionCategoryId;
     }
 
-    public void setTypeTransaction(String typeTransaction) {
-        this.typeTransaction = typeTransaction;
+    public void setTransactionCategoryId(int transactionCategoryId) {
+        this.transactionCategoryId = transactionCategoryId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Transaction that = (Transaction) o;
-        return id == that.id && Objects.equals(label, that.label) && Objects.equals(value, that.value) && Objects.equals(dateTimeTransaction, that.dateTimeTransaction) && Objects.equals(typeTransaction, that.typeTransaction);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, label, value, dateTimeTransaction, typeTransaction);
-    }
-
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "id=" + id +
-                ", label='" + label + '\'' +
-                ", value=" + value +
-                ", dateTimeTransaction=" + dateTimeTransaction +
-                ", typeTransaction='" + typeTransaction + '\'' +
-                '}';
+    public Transaction(int id, String label, Double value, Timestamp dateTimeTransaction, int transactionCategoryId) {
+        this.id = id;
+        this.label = label;
+        this.value = value;
+        this.dateTimeTransaction = dateTimeTransaction;
+        this.transactionCategoryId = transactionCategoryId;
     }
 }

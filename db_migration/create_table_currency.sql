@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS currencies;
 CREATE TABLE currencies(
-     currency_id SERIAL PRIMARY KEY,
+     currency_id INT PRIMARY KEY,
      name VARCHAR(50),
      code VARCHAR(50)
 );

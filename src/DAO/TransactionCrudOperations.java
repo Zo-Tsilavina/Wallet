@@ -17,11 +17,18 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
     public TransactionCrudOperations() {
         this.connectionDB = new ConnectionDB();
     }
+    private final String transactionIdCol = "transaction_id";
+    private final String transactionLabelCol = "label";
+    private final String transactionValueCol = "value";
+    private final String transactionDateCol = "date_time_transaction";
+    private final String transactionCategoryIdCol = "transaction_category_id";
+
 
 
     @Override
     public List<Transaction> findAll() {
         List<Transaction> transactions = new ArrayList<>();
+
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement statement= connection.prepareStatement("SELECT * FROM transactions");
@@ -29,11 +36,11 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
         ){
             while (resultSet.next()){
                 Transaction transaction = new Transaction(
-                        resultSet.getInt("transaction_id"),
-                        resultSet.getString("label"),
-                        resultSet.getDouble("value"),
-                        resultSet.getTimestamp("date_time_transaction"),
-                        resultSet.getString("type_transaction")
+                        resultSet.getInt(transactionIdCol),
+                        resultSet.getString(transactionLabelCol),
+                        resultSet.getDouble(transactionValueCol),
+                        resultSet.getTimestamp(transactionDateCol),
+                        resultSet.getInt(transactionCategoryIdCol)
                 );
                 transactions.add(transaction);
                 connection.close();
@@ -55,11 +62,11 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             transaction = new Transaction(
-                    resultSet.getInt("transaction_id"),
-                    resultSet.getString("label"),
-                    resultSet.getDouble("value"),
-                    resultSet.getTimestamp("date_time_transaction"),
-                    resultSet.getString("type_transaction")
+                    resultSet.getInt(transactionIdCol),
+                    resultSet.getString(transactionLabelCol),
+                    resultSet.getDouble(transactionValueCol),
+                    resultSet.getTimestamp(transactionDateCol),
+                    resultSet.getInt(transactionCategoryIdCol)
             );
         } catch (SQLException e) {
             e.printStackTrace();
@@ -72,34 +79,37 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM transactions WHERE label = ? AND value = ? AND date_time_transaction = ? AND type_transaction = ?"
+                        "SELECT * FROM transactions WHERE transaction_id = ? AND label = ? AND value = ? AND date_time_transaction = ? AND transaction_category_id = ?"
                 )
         ) {
-            selectStatement.setString(1, transaction.getLabel());
-            selectStatement.setDouble(2, transaction.getValue());
-            selectStatement.setTimestamp(3, transaction.getDateTimeTransaction());
-            selectStatement.setString(4, transaction.getTypeTransaction());
+            selectStatement.setInt(1, transaction.getId());
+            selectStatement.setString(2, transaction.getLabel());
+            selectStatement.setDouble(3, transaction.getValue());
+            selectStatement.setTimestamp(4, transaction.getDateTimeTransaction());
+            selectStatement.setInt(5, transaction.getTransactionCategoryId());
 
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
                     try (PreparedStatement updateStatement = connection.prepareStatement(
-                            "UPDATE transactions SET value = ?, date_time_transaction = ? WHERE label = ? AND type_transaction = ?"
+                            "UPDATE transactions SET value = ?, date_time_transaction = ? WHERE transaction_id = ? AND label = ? AND transaction_category_id = ?"
                     )) {
                         updateStatement.setDouble(1, transaction.getValue());
                         updateStatement.setTimestamp(2, transaction.getDateTimeTransaction());
-                        updateStatement.setString(3, transaction.getLabel());
-                        updateStatement.setString(4, transaction.getTypeTransaction());
+                        updateStatement.setInt(3,transaction.getId());
+                        updateStatement.setString(4, transaction.getLabel());
+                        updateStatement.setInt(5, transaction.getTransactionCategoryId());
 
                         updateStatement.executeUpdate();
                     }
                 } else {
                     try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO transactions (label, value, date_time_transaction, type_transaction) VALUES (?, ?, ?, ?)"
+                            "INSERT INTO transactions (transaction_id, label, value, date_time_transaction, transaction_category_id) VALUES (?, ?, ?, ?, ?)"
                     )) {
-                        insertStatement.setString(1, transaction.getLabel());
-                        insertStatement.setDouble(2, transaction.getValue());
-                        insertStatement.setTimestamp(3, transaction.getDateTimeTransaction());
-                        insertStatement.setString(4, transaction.getTypeTransaction());
+                        insertStatement.setInt(1,transaction.getId());
+                        insertStatement.setString(2, transaction.getLabel());
+                        insertStatement.setDouble(3, transaction.getValue());
+                        insertStatement.setTimestamp(4, transaction.getDateTimeTransaction());
+                        insertStatement.setInt(5, transaction.getTransactionCategoryId());
 
 
                         insertStatement.executeUpdate();
