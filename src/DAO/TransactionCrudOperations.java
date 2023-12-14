@@ -1,7 +1,6 @@
 package DAO;
 
 import JDBC.ConnectionDB;
-import models.Currency;
 import models.Transaction;
 
 import java.sql.Connection;

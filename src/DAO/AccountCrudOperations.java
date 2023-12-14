@@ -3,6 +3,7 @@ package DAO;
 import JDBC.ConnectionDB;
 import models.Account;
 import models.Transaction;
+import models.TransactionCategory;
 import models.TransferHistory;
 
 import java.sql.*;
@@ -142,25 +143,28 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return account;
     }
 
-    public Account doTransaction (Transaction transaction, Account account){
+    public Account doTransaction (Transaction transaction, int accountId){
 
         TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+        TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
+        TransactionCategory transactionCategory = transactionCategoryCrudOperations.findById(transaction.getTransactionCategoryId());
+        Account account = accountCrudOperations.findById(accountId);
 
-            if(transaction.getTypeTransaction().equals("debit")){
+            if(transactionCategory.getType().equals("debit")){
                 if((account.getAmount()-transaction.getValue() < 0)) {
                     if (account.getType().equals("compte bancaire")) {
                         account.setAmount(account.getAmount() - transaction.getValue());
 
                     }else {
-                        throw new RuntimeException("transaction failed, solde insufisante");
+                        throw new RuntimeException("transaction failed");
                     }
 
                 }else {
                     account.setAmount(account.getAmount() - transaction.getValue());
                 }
 
-            } else if (transaction.getTypeTransaction().equals("credit")) {
+            } else if (transactionCategory.getType().equals("credit")) {
                 account.setAmount(account.getAmount() + transaction.getValue());
 
             }else{
@@ -177,23 +181,29 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return account;
     }
 
-    public Account getAccountBalance (Timestamp timestamp, Account account){
-
+    public Account getAccountBalance (Timestamp timestamp, int accountId){
+        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+        Account account = accountCrudOperations.findById(accountId);
         List<Integer> currentTransactionIdList = new ArrayList<>();
         List<Integer> transactionIdList = account.getTransactionsId();
 
         for (int transactionId : transactionIdList) {
+
             currentTransactionIdList.add(transactionId);
             TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
             Transaction currentTransaction = transactionCrudOperations.findById(transactionId);
             Timestamp currentTransactionTimestamp = currentTransaction.getDateTimeTransaction();
+            TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
+            TransactionCategory currentTransactionCategory = transactionCategoryCrudOperations.findById(transactionId);
+
+
             if (timestamp.after(currentTransactionTimestamp) || timestamp.equals(currentTransactionTimestamp)) {
 
-                if (currentTransaction.getTypeTransaction().equals("credit")) {
+                if (currentTransactionCategory.getType().equals("credit")) {
                     account.setAmount(account.getAmount() + currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
                     account.setTransactionsId(currentTransactionIdList);
-                } else if (currentTransaction.getTypeTransaction().equals("debit")) {
+                } else if (currentTransactionCategory.getType().equals("debit")) {
                     account.setAmount(account.getAmount() - currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
                     account.setTransactionsId(currentTransactionIdList);
@@ -205,12 +215,14 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return account;
     }
 
-    public List<Account> getAccountBalanceHistory (Timestamp startDate, Timestamp endDate, Account account){
+    public List<Account> getAccountBalanceHistory (Timestamp startDate, Timestamp endDate, int accountId){
 
 //          recuperer le solde a la date startDate a l'aide de getAccountBalance
 //          recuperer toute les transactions lie a ce compte durant le periode defini
 //          recuperer le solde du compte a chaque transaction durant cette periode
 
+        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+        Account account = accountCrudOperations.findById(accountId);
         List<Account> accounts = new ArrayList<>();
         List<Integer> transactionIdList = account.getTransactionsId();
         List<Integer> currentTransactionIdList = new ArrayList<>();
@@ -220,17 +232,20 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
             Transaction currentTransaction = transactionCrudOperations.findById(transactionId);
             Timestamp currentTransactionTimestamp = currentTransaction.getDateTimeTransaction();
+            TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
+            TransactionCategory currentTransactionCategory = transactionCategoryCrudOperations.findById(transactionId);
+
 
             currentTransactionIdList.add(transactionId);
             if (currentTransactionTimestamp.before(startDate)){
 
-                if (currentTransaction.getTypeTransaction().equals("credit")) {
+                if (currentTransactionCategory.getType().equals("credit")) {
 
                     account.setAmount(account.getAmount() + currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
                     account.setTransactionsId(currentTransactionIdList);
 
-                } else if (currentTransaction.getTypeTransaction().equals("debit")) {
+                } else if (currentTransactionCategory.getType().equals("debit")) {
 
                     account.setAmount(account.getAmount() - currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
@@ -240,11 +255,11 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             }else if ((startDate.before(currentTransactionTimestamp) || startDate.equals(currentTransactionTimestamp))
                     && (endDate.after(currentTransactionTimestamp) || endDate.equals(currentTransactionTimestamp))) {
 
-                if (currentTransaction.getTypeTransaction().equals("credit")) {
+                if (currentTransactionCategory.getType().equals("credit")) {
                     account.setAmount(account.getAmount() + currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
                     account.setTransactionsId(currentTransactionIdList);
-                } else if (currentTransaction.getTypeTransaction().equals("debit")) {
+                } else if (currentTransactionCategory.getType().equals("debit")) {
 
                     account.setAmount(account.getAmount() - currentTransaction.getValue());
                     account.setLastUpdateDate(currentTransactionTimestamp);
@@ -268,10 +283,13 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return accounts;
 
     }
-    public List<Account> transfer (Account creditor , Account debtor, double amount) {
+    public List<Account> transfer (int creditorId , int debtorId, double amount) {
 
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
         TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+
+        Account creditor = accountCrudOperations.findById(creditorId);
+        Account debtor = accountCrudOperations.findById(debtorId);
 
         int creditorCurrencyId = creditor.getCurrencyId();
         int debtorCurrencyId = debtor.getCurrencyId();
@@ -290,19 +308,18 @@ public class AccountCrudOperations implements CrudOperations<Account> {
                     "transfer",
                     amount,
                     Timestamp.valueOf(String.valueOf(Instant.now())),
-                    "debit"
+                    5
             );
-            accountCrudOperations.doTransaction(transactionCreditor, creditor);
+            accountCrudOperations.doTransaction(transactionCreditor, creditor.getId());
 
             Transaction transactionDebtor = new Transaction(
                     randomNumber,
                     "transfer",
                     amount,
                     timestamp,
-                    "credit"
+                    6
             );
-            accountCrudOperations.doTransaction(transactionDebtor, debtor);
-
+            accountCrudOperations.doTransaction(transactionDebtor, debtor.getId());
         }
 //            verifier si ce n est pas le meme :
 //                - si oui : le transfert ne peut pas avoir lieu

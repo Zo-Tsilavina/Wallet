@@ -1,7 +1,6 @@
 package DAO;
 
 import JDBC.ConnectionDB;
-import models.Transaction;
 import models.TransactionCategory;
 
 import java.sql.Connection;
@@ -73,12 +72,11 @@ public class TransactionCategoryCrudOperations implements CrudOperations<Transac
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM transaction_categories WHERE transaction_category_id = ? AND name = ? AND type = ?"
+                        "SELECT * FROM transaction_categories WHERE transaction_category_id = ? AND name = ?"
                 )
         ) {
             selectStatement.setInt(1, transactionCategory.getId());
             selectStatement.setString(2, transactionCategory.getName());
-            selectStatement.setString(3, transactionCategory.getType());
 
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
