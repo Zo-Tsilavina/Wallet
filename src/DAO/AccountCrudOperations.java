@@ -58,31 +58,32 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         Account account = null;
         try (Connection connection = connectionDB.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM accounts WHERE account_id = ?");
-
         ) {
             statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-                String transactionsId = resultSet.getString("transactions_id");
-                account = new Account(
-                        resultSet.getInt("account_id"),
-                        resultSet.getString("name"),
-                        resultSet.getDouble("amount"),
-                        resultSet.getTimestamp("last_update_date"),
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    String transactionsId = resultSet.getString("transactions_id");
+                    account = new Account(
+                            resultSet.getInt("account_id"),
+                            resultSet.getString("name"),
+                            resultSet.getDouble("amount"),
+                            resultSet.getTimestamp("last_update_date"),
 
-                        Arrays.stream(transactionsId.split(","))
-                                .map(Integer::parseInt)
-                                .collect(Collectors.toList()),
+                            Arrays.stream(transactionsId.split(","))
+                                    .map(Integer::parseInt)
+                                    .collect(Collectors.toList()),
 
-                        resultSet.getInt("currency_id"),
-                        resultSet.getString("type")
-
-                );
+                            resultSet.getInt("currency_id"),
+                            resultSet.getString("type")
+                    );
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return account;
     }
+
 
     @Override
     public Account save(Account account) {
@@ -283,58 +284,62 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return accounts;
 
     }
-    public List<Account> transfer (int creditorId , int debtorId, double amount) {
-
+    public List<Account> transfer(int creditorId, int debtorId, double amount) {
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
-
         Account creditor = accountCrudOperations.findById(creditorId);
-        Account debtor = accountCrudOperations.findById(debtorId);
+        AccountCrudOperations accountCrudOperations1 = new AccountCrudOperations();
+        Account debtor = accountCrudOperations1.findById(debtorId);
+
+        if (creditor.equals(debtor)) {
+            throw new RuntimeException("Le créditeur et le débiteur sont identiques.");
+        }
 
         int creditorCurrencyId = creditor.getCurrencyId();
         int debtorCurrencyId = debtor.getCurrencyId();
-        int randomNumber = (int) Math.random();
-        Instant instant = Instant.now();
-        Timestamp timestamp = Timestamp.from(instant);
 
-        if (creditor.equals(debtor)) {
+        if (creditorCurrencyId == debtorCurrencyId) {
+            Instant instant = Instant.now();
+            Timestamp timestamp = Timestamp.from(instant);
 
-            throw new RuntimeException();
+            // Vérification si le créditeur a suffisamment de fonds pour la transaction
+            if (creditor.getAmount() >= amount) {
+                // Déduction du montant du créditeur
+                double newCreditorAmount = creditor.getAmount() - amount;
+                creditor.setAmount(newCreditorAmount);
 
-        } else if (creditorCurrencyId == debtorCurrencyId) {
+                // Ajout du montant au débiteur
+                double newDebtorAmount = debtor.getAmount() + amount;
+                debtor.setAmount(newDebtorAmount);
 
-            Transaction transactionCreditor = new Transaction(
-                    randomNumber,
-                    "transfer",
-                    amount,
-                    Timestamp.valueOf(String.valueOf(Instant.now())),
-                    5
-            );
-            accountCrudOperations.doTransaction(transactionCreditor, creditor.getId());
+                Transaction transactionCreditor = new Transaction(
+                        creditor.getId(),
+                        "transfer",
+                        -amount, // Montant négatif pour le créditeur
+                        timestamp,
+                        5
+                );
+                AccountCrudOperations accountCrudOperations2 = new AccountCrudOperations();
+                accountCrudOperations2.doTransaction(transactionCreditor, creditor.getId());
 
-            Transaction transactionDebtor = new Transaction(
-                    randomNumber,
-                    "transfer",
-                    amount,
-                    timestamp,
-                    6
-            );
-            accountCrudOperations.doTransaction(transactionDebtor, debtor.getId());
+                Transaction transactionDebtor = new Transaction(
+                        debtor.getId(),
+                        "transfer",
+                        amount, // Montant positif pour le débiteur
+                        timestamp,
+                        6
+                );
+                AccountCrudOperations accountCrudOperations3 = new AccountCrudOperations();
+                accountCrudOperations3.doTransaction(transactionDebtor, debtor.getId());
+
+                return Arrays.asList(creditor, debtor);
+            } else {
+                throw new RuntimeException("Le créditeur n'a pas suffisamment de fonds pour la transaction.");
+            }
+        } else {
+            throw new UnsupportedOperationException("Transfert entre devises différentes non pris en charge pour le moment.");
         }
-//            verifier si ce n est pas le meme :
-//                - si oui : le transfert ne peut pas avoir lieu
-//                - sinon:
-//                    verifier si les deux comptes ont le meme devise
-//                        -si oui:
-//                            cree une nouvelle transaction pour chaque compte
-//                                (type debit pour le creditor et de type credit pour l'autre)
-//                            effectuer un doTransaction() pour chaque compte pour mettre a jour leur solde
-//
-//                                    pour la fonction pour l'historique :
-//                                         ... (cree l'entity d'abord)
-//                        -si non:
-        return null;
     }
+
     public List<TransferHistory> getTransferHistories (Timestamp startDate, Timestamp endDate){
 
         TransferHistoryCrudOperations transferHistoryCrudOperations = new TransferHistoryCrudOperations();

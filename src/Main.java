@@ -18,29 +18,32 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-//        List<Integer> transaction = new ArrayList<>();
-//        Instant instant = Instant.now();
-//        Timestamp timestamp = Timestamp.from(instant);
-//        Account debtor = new Account(
-//            3,
-//            "tsila",
-//            500.00,
-//            timestamp,
-//                transaction,
-//                2,
-//                "compte bancaire"
-//        );
-//
-//        Account creditor = new Account(
-//                3,
-//                "junka",
-//                500.00,
-//                timestamp,
-//                transaction,
-//                2,
-//                "compte epargne"
-//        );
-//        System.out.println(accountCrudOperations.transfer(creditor, debtor, 500.00));
+        List<Integer> transaction = new ArrayList<>();
+        Instant instant = Instant.now();
+        Timestamp timestamp = Timestamp.from(instant);
+
+        Account debtor = new Account(
+                1,
+                "tsila",
+                500.00,
+                timestamp,
+                transaction,
+                2,
+                "compte bancaire"
+        );
+
+        Account creditor = new Account(
+                2, // Identifiant unique du compte créditeur
+                "junka",
+                500.00,
+                timestamp,
+                transaction,
+                2,
+                "compte epargne"
+        );
+
+        // Appel de la méthode transfer avec les identifiants des comptes
+        System.out.println(accountCrudOperations.transfer(1, 3, 500.00));
     }
 
 }
