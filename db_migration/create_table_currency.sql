@@ -4,5 +4,5 @@ CREATE TABLE currencies(
      name VARCHAR(50),
      code VARCHAR(50)
 );
-INSERT INTO currencies (name, code) VALUES ('Ariary', 'MGA');
-INSERT INTO currencies (name, code) VALUES ('EURO', 'EUR');
+INSERT INTO currencies (currency_id, name, code) VALUES (1, 'Ariary', 'MGA');
+INSERT INTO currencies (currency_id, name, code) VALUES (2, 'EURO', 'EUR');
