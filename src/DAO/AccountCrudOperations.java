@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class AccountCrudOperations implements CrudOperations<Account> {
@@ -176,8 +177,12 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         transactionIdList.add(transaction.getId());
         account.setTransactionsId(transactionIdList);
         account.setLastUpdateDate(transaction.getDateTimeTransaction());
-        accountCrudOperations.save(account);
-        transactionCrudOperations.save(transaction);
+
+        AccountCrudOperations accountCrudOperations1 = new AccountCrudOperations();
+        accountCrudOperations1.save(account);
+
+        TransactionCrudOperations transactionCrudOperations1 = new TransactionCrudOperations();
+        transactionCrudOperations1.save(transaction);
 
         return account;
     }
@@ -285,10 +290,12 @@ public class AccountCrudOperations implements CrudOperations<Account> {
 
     }
     public List<Account> transfer(int creditorId, int debtorId, double amount) {
+
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
         Account creditor = accountCrudOperations.findById(creditorId);
         AccountCrudOperations accountCrudOperations1 = new AccountCrudOperations();
         Account debtor = accountCrudOperations1.findById(debtorId);
+        int randomInt = new Random().nextInt(1001);
 
         if (creditor.equals(debtor)) {
             throw new RuntimeException("Le créditeur et le débiteur sont identiques.");
@@ -301,32 +308,31 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             Instant instant = Instant.now();
             Timestamp timestamp = Timestamp.from(instant);
 
-            // Vérification si le créditeur a suffisamment de fonds pour la transaction
             if (creditor.getAmount() >= amount) {
-                // Déduction du montant du créditeur
+
                 double newCreditorAmount = creditor.getAmount() - amount;
                 creditor.setAmount(newCreditorAmount);
 
-                // Ajout du montant au débiteur
                 double newDebtorAmount = debtor.getAmount() + amount;
                 debtor.setAmount(newDebtorAmount);
 
                 Transaction transactionCreditor = new Transaction(
-                        creditor.getId(),
+                        randomInt,
                         "transfer",
-                        -amount, // Montant négatif pour le créditeur
+                        amount,
                         timestamp,
-                        5
+                        12
                 );
                 AccountCrudOperations accountCrudOperations2 = new AccountCrudOperations();
                 accountCrudOperations2.doTransaction(transactionCreditor, creditor.getId());
+                int randomInt2 = new Random().nextInt(1001);
 
                 Transaction transactionDebtor = new Transaction(
-                        debtor.getId(),
+                        randomInt2,
                         "transfer",
-                        amount, // Montant positif pour le débiteur
+                        amount,
                         timestamp,
-                        6
+                        11
                 );
                 AccountCrudOperations accountCrudOperations3 = new AccountCrudOperations();
                 accountCrudOperations3.doTransaction(transactionDebtor, debtor.getId());

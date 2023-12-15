@@ -54,13 +54,15 @@ public class TransactionCategoryCrudOperations implements CrudOperations<Transac
 
         ) {
             statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            transactionCategory = new TransactionCategory(
-                    resultSet.getInt(transactionCategoryIdCol),
-                    resultSet.getString(transactionCategoryNameCol),
-                    resultSet.getString(transactionCategoryTypeCol)
-            );
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    transactionCategory = new TransactionCategory(
+                            resultSet.getInt(transactionCategoryIdCol),
+                            resultSet.getString(transactionCategoryNameCol),
+                            resultSet.getString(transactionCategoryTypeCol)
+                    );
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

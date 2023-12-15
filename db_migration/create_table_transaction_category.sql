@@ -15,3 +15,5 @@ INSERT INTO transaction_categories (transaction_category_id, name, type) VALUES 
 INSERT INTO transaction_categories (transaction_category_id, name, type) VALUES (8, 'Frais financiers', 'debit');
 INSERT INTO transaction_categories (transaction_category_id, name, type) VALUES (9, 'Investissement', 'debit');
 INSERT INTO transaction_categories (transaction_category_id, name, type) VALUES (10, 'Revenu', 'credit');
+INSERT INTO transaction_categories (transaction_category_id, name, type) VALUES (11, 'Transfer', 'credit');
+INSERT INTO transaction_categories (transaction_category_id, name, type) VALUES (12, 'Transfer', 'debit');
