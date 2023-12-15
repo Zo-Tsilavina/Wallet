@@ -1,14 +1,12 @@
 package DAO;
 
 import JDBC.ConnectionDB;
+import models.Account;
+import models.Transaction;
 import models.TransactionCategory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.*;
+import java.util.*;
 
 public class TransactionCategoryCrudOperations implements CrudOperations<TransactionCategory> {
     private ConnectionDB connectionDB;
@@ -102,5 +100,37 @@ public class TransactionCategoryCrudOperations implements CrudOperations<Transac
         }
         return transactionCategory;
     }
+    public Map<String, Double> allAccountTransactionByCategory (int accountId, Timestamp startDate, Timestamp endDate){
 
+            AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+            Account account = accountCrudOperations.findById(accountId);
+        List<Integer> allTransactionId = account.getTransactionsId();
+        Map<String, Double> allAccountTransactionByCategory = new HashMap<>();
+
+            allTransactionId.forEach(transactionId -> {
+
+                TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+                Transaction currentTransaction = transactionCrudOperations.findById(transactionId);
+                int currentTransactionCategoryId = currentTransaction.getTransactionCategoryId();
+
+                TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
+                TransactionCategory currentTransactionCategory = transactionCategoryCrudOperations.findById(currentTransactionCategoryId);
+                String currentTransactionCategoryName = currentTransactionCategory.getName();
+                Timestamp currentTransactionTimestamp = currentTransaction.getDateTimeTransaction();
+
+                if ((startDate.before(currentTransactionTimestamp) || startDate.equals(currentTransactionTimestamp))
+                        && (endDate.after(currentTransactionTimestamp) || endDate.equals(currentTransactionTimestamp))) {
+
+                    if (allAccountTransactionByCategory.containsKey(currentTransactionCategoryName)) {
+
+                        Double oldValue = allAccountTransactionByCategory.get(currentTransactionCategoryName);
+                        allAccountTransactionByCategory.put(currentTransactionCategoryName, oldValue + currentTransaction.getValue());
+
+                    }else {
+                        allAccountTransactionByCategory.put(currentTransactionCategoryName, currentTransaction.getValue());
+                    }
+                }
+            });
+        return allAccountTransactionByCategory;
+    }
 }
