@@ -15,11 +15,37 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-//        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-//        List<Integer> transaction = new ArrayList<>();
-//        Instant instant = Instant.now();
-//        Timestamp timestamp = Timestamp.from(instant);
-//
+        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+
+        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+        List<Integer> transaction = new ArrayList<>();
+        transaction.add(50);
+        Instant instant = Instant.now();
+        Timestamp timestamp = Timestamp.from(instant);
+
+
+        // ======================= FINDBY ID TRANSACTION
+//        System.out.println(transactionCrudOperations.findById(3));
+
+        //  ======================= SAVE ACCOUNT
+//                Account debtor = new Account(
+//                100,
+//                "test",
+//                500.00,
+//                timestamp,
+//                transaction,
+//                2,
+//                "compte bancaire"
+//        );
+//        System.out.println(accountCrudOperations.save(debtor));
+
+                // ======================== FIND ALL
+//        System.out.println(accountCrudOperations.findAll());
+
+                // ======================== FIND BY ID
+//         System.out.println(accountCrudOperations.findById(100));
+
+                // ======================= TRANSFER OR DO TRANSACTION
 //        Account debtor = new Account(
 //                1,
 //                "tsila",
@@ -39,12 +65,28 @@ public class Main {
 //                2,
 //                "compte epargne"
 //        );
-//
+//        System.out.println(accountCrudOperations.transfer(3, 1, 1000.00));
+
+                        // ===================== DO TRANSACTION
+//        Transaction doTransaction = new Transaction(
+//                101,
+//                "test",
+//                10000.00,
+//                timestamp,
+//                2
+//        );
+//        System.out.println(accountCrudOperations.doTransaction(doTransaction, 100));
+
+                        // ===================== GET ACCOUNT BALANCE
+//        System.out.println(accountCrudOperations.getAccountBalance(timestamp, 100));
+    TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
+    transactionCategoryCrudOperations.findById(11);
+
 //        // Appel de la méthode transfer avec les identifiants des comptes
 //        System.out.println(accountCrudOperations.transfer(1, 3, 500.00));
 
-        TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
-        System.out.println(transactionCategoryCrudOperations.allAccountTransactionByCategory(1, Timestamp.valueOf("2023-12-02 02:00:00"), Timestamp.valueOf("2023-12-15 13:49:08.727148")));
+//        TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
+//        System.out.println(transactionCategoryCrudOperations.allAccountTransactionByCategory(1, Timestamp.valueOf("2023-12-02 02:00:00"), Timestamp.valueOf("2023-12-15 13:49:08.727148")));
     }
 
 }

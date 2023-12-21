@@ -65,11 +65,12 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM currencies WHERE name = ? AND code = ?"
+                        "SELECT * FROM currencies WHERE currency_id = ? AND name = ? AND code = ?"
                 )
         ) {
-            selectStatement.setString(1, currency.getName());
-            selectStatement.setString(2, currency.getCode());
+            selectStatement.setInt(1,currency.getId());
+            selectStatement.setString(2, currency.getName());
+            selectStatement.setString(3, currency.getCode());
 
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -83,10 +84,11 @@ public class CurrencyCrudOperations implements CrudOperations<Currency>{
                     }
                 } else {
                     try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO currencies (name, code) VALUES (?, ?)"
+                            "INSERT INTO currencies (currency_id, name, code) VALUES (?, ?, ?)"
                     )) {
-                        insertStatement.setString(1, currency.getName());
-                        insertStatement.setString(2, currency.getCode());
+                        insertStatement.setInt(1,currency.getId());
+                        insertStatement.setString(2, currency.getName());
+                        insertStatement.setString(3, currency.getCode());
 
                         insertStatement.executeUpdate();
                     }

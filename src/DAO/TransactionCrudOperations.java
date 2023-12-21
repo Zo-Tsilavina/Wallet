@@ -58,15 +58,17 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
 
         ) {
             statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            transaction = new Transaction(
-                    resultSet.getInt(transactionIdCol),
-                    resultSet.getString(transactionLabelCol),
-                    resultSet.getDouble(transactionValueCol),
-                    resultSet.getTimestamp(transactionDateCol),
-                    resultSet.getInt(transactionCategoryIdCol)
-            );
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    transaction = new Transaction(
+                            resultSet.getInt(transactionIdCol),
+                            resultSet.getString(transactionLabelCol),
+                            resultSet.getDouble(transactionValueCol),
+                            resultSet.getTimestamp(transactionDateCol),
+                            resultSet.getInt(transactionCategoryIdCol)
+                    );
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

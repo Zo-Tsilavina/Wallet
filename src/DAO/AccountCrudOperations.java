@@ -91,48 +91,41 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM accounts WHERE name = ? AND currency_id = ? AND type = ?"
+                        "SELECT * FROM accounts WHERE account_id = ?"
                 )
         ) {
-            selectStatement.setString(1, account.getName());
-//            selectStatement.setString(2, account.getTransactionsId()
-//                    .stream()
-//                    .map(Object::toString)
-//                    .collect(Collectors.joining(",")));
-            selectStatement.setInt(2, account.getCurrencyId());
-            selectStatement.setString(3, account.getType());
-
+            selectStatement.setInt(1,account.getId());
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
                     try (PreparedStatement updateStatement = connection.prepareStatement(
-                            "UPDATE accounts SET amount = ?, transactions_id = ? , last_update_date = ? WHERE name = ? AND currency_id = ? AND type = ?"
+                            "UPDATE accounts SET name = ?, type = ?, amount = ?, transactions_id = ? , last_update_date = ? WHERE account_id = ?"
                     )) {
-                        updateStatement.setDouble(1, account.getAmount());
-                        updateStatement.setString(2, account.getTransactionsId()
+                        updateStatement.setString(1, account.getName());
+                        updateStatement.setString(2, account.getType());
+                        updateStatement.setDouble(3, account.getAmount());
+                        updateStatement.setString(4, account.getTransactionsId()
                                 .stream()
                                 .map(Object::toString)
                                 .collect(Collectors.joining(",")));
-                        updateStatement.setTimestamp(3, account.getLastUpdateDate());
-                        updateStatement.setString(4, account.getName());
-
-                        updateStatement.setInt(5, account.getCurrencyId());
-                        updateStatement.setString(6, account.getType());
+                        updateStatement.setTimestamp(5, account.getLastUpdateDate());
+                        updateStatement.setInt(6, account.getId());
 
                         updateStatement.executeUpdate();
                     }
                 } else {
                     try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO accounts (name, amount, last_update_date, transactions_id, currency_id, type) VALUES (?, ?, ?, ?, ?, ?)"
+                            "INSERT INTO accounts (account_id, name, amount, last_update_date, transactions_id, currency_id, type) VALUES (?, ?, ?, ?, ?, ?, ?)"
                     )) {
-                        insertStatement.setString(1, account.getName());
-                        insertStatement.setDouble(2, account.getAmount());
-                        insertStatement.setTimestamp(3, account.getLastUpdateDate());
-                        insertStatement.setString(4, account.getTransactionsId()
+                        insertStatement.setInt(1, account.getId());
+                        insertStatement.setString(2, account.getName());
+                        insertStatement.setDouble(3, account.getAmount());
+                        insertStatement.setTimestamp(4, account.getLastUpdateDate());
+                        insertStatement.setString(5, account.getTransactionsId()
                                 .stream()
                                 .map(Object::toString)
                                 .collect(Collectors.joining(",")));
-                        insertStatement.setInt(5, account.getCurrencyId());
-                        insertStatement.setString(6, account.getType());
+                        insertStatement.setInt(6, account.getCurrencyId());
+                        insertStatement.setString(7, account.getType());
 
                         insertStatement.executeUpdate();
                     }
@@ -198,6 +191,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             currentTransactionIdList.add(transactionId);
             TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
             Transaction currentTransaction = transactionCrudOperations.findById(transactionId);
+
             Timestamp currentTransactionTimestamp = currentTransaction.getDateTimeTransaction();
             TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
             TransactionCategory currentTransactionCategory = transactionCategoryCrudOperations.findById(transactionId);
@@ -222,10 +216,6 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     }
 
     public List<Account> getAccountBalanceHistory (Timestamp startDate, Timestamp endDate, int accountId){
-
-//          recuperer le solde a la date startDate a l'aide de getAccountBalance
-//          recuperer toute les transactions lie a ce compte durant le periode defini
-//          recuperer le solde du compte a chaque transaction durant cette periode
 
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
         Account account = accountCrudOperations.findById(accountId);

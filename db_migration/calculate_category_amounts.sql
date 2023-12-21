@@ -6,8 +6,8 @@ CREATE OR REPLACE FUNCTION calculate_category_amounts(
 BEGIN
     RETURN QUERY
     SELECT
-        COALESCE(SUM(CASE WHEN tc.name = 'Restaurant' THEN t.value ELSE 0 END), 0) AS restaurant,
-        COALESCE(SUM(CASE WHEN tc.name = 'Salaire' THEN t.value ELSE 0 END), 0) AS salaire
+        COALESCE(SUM(CASE WHEN tc.name = 'Logement' THEN t.value ELSE 0 END), 0) AS restaurant,
+        COALESCE(SUM(CASE WHEN tc.name = 'Transfer' THEN t.value ELSE 0 END), 0) AS salaire
     FROM transaction_categories tc
     LEFT JOIN transactions t
         ON tc.transaction_category_id = t.transaction_category_id
