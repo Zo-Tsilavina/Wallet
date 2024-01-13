@@ -6,13 +6,16 @@ import java.util.Objects;
 
 public class Account {
 
-    private final int id;
+    private int id;
     private String name;
     private double amount;
     private Timestamp lastUpdateDate;
     private List<Integer> transactionsId;
-    private final int currencyId;
+    private int currencyId;
     private String type;
+
+    public Account() {
+    }
 
     @Override
     public String toString() {
@@ -96,4 +99,5 @@ public class Account {
         this.currencyId = currencyId;
         this.type = type;
     }
+
 }

@@ -1,10 +1,10 @@
 package DAO;
 
+import AutoCrudOperation.AutoCrudOp;
 import JDBC.ConnectionDB;
 import models.Account;
 import models.Transaction;
 import models.TransactionCategory;
-import models.TransferHistory;
 
 import java.sql.*;
 import java.time.Instant;
@@ -15,57 +15,30 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class AccountCrudOperations implements CrudOperations<Account> {
-    private ConnectionDB connectionDB;
+    private final ConnectionDB connectionDB;
 
     public AccountCrudOperations() {
         this.connectionDB = new ConnectionDB();
     }
 
     @Override
-    public List<Account> findAll() {
-        List<Account> accounts = new ArrayList<>();
-        try (
-                Connection connection = connectionDB.getConnection();
-                PreparedStatement statement= connection.prepareStatement("SELECT * FROM accounts");
-                ResultSet resultSet = statement.executeQuery()
-        ){
-          while (resultSet.next()){
-
-              String transactionsId = resultSet.getString("transactions_id");
-              Account account = new Account(
-                      resultSet.getInt("account_id"),
-                      resultSet.getString("name"),
-                      resultSet.getDouble("amount"),
-                      resultSet.getTimestamp("last_update_date"),
-
-                      Arrays.stream(transactionsId.split(","))
-                              .map(Integer::parseInt)
-                              .collect(Collectors.toList()),
-
-                      resultSet.getInt("currency_id"),
-                      resultSet.getString("type")
-              );
-              accounts.add(account);
-              connection.close();
-          }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return accounts;
+    public List<Account> findAll() throws SQLException {
+        AutoCrudOp<Account> autoCrudOp = new AutoCrudOp<>(Account.class);
+        return autoCrudOp.findAll();
     }
 
     @Override
     public Account findById(int id) {
         Account account = null;
         try (Connection connection = connectionDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM accounts WHERE account_id = ?");
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM account WHERE id = ?");
         ) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String transactionsId = resultSet.getString("transactions_id");
                     account = new Account(
-                            resultSet.getInt("account_id"),
+                            resultSet.getInt("id"),
                             resultSet.getString("name"),
                             resultSet.getDouble("amount"),
                             resultSet.getTimestamp("last_update_date"),
@@ -91,14 +64,14 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM accounts WHERE account_id = ?"
+                        "SELECT * FROM account WHERE id = ?"
                 )
         ) {
             selectStatement.setInt(1,account.getId());
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
                     try (PreparedStatement updateStatement = connection.prepareStatement(
-                            "UPDATE accounts SET name = ?, type = ?, amount = ?, transactions_id = ? , last_update_date = ? WHERE account_id = ?"
+                            "UPDATE account SET name = ?, type = ?, amount = ?, transactions_id = ? , last_update_date = ? WHERE id = ?"
                     )) {
                         updateStatement.setString(1, account.getName());
                         updateStatement.setString(2, account.getType());
@@ -114,7 +87,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
                     }
                 } else {
                     try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO accounts (account_id, name, amount, last_update_date, transactions_id, currency_id, type) VALUES (?, ?, ?, ?, ?, ?, ?)"
+                            "INSERT INTO account (id, name, amount, last_update_date, transactions_id, currency_id, type) VALUES (?, ?, ?, ?, ?, ?, ?)"
                     )) {
                         insertStatement.setInt(1, account.getId());
                         insertStatement.setString(2, account.getName());

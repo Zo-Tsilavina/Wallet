@@ -2,7 +2,10 @@ import DAO.*;
 import models.Account;
 import models.Currency;
 import models.Transaction;
+import models.TransferHistory;
 
+import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -14,14 +17,14 @@ import java.util.List;
 
 
 public class Main {
-    public static void main(String[] args) {
-        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
-
-        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-        List<Integer> transaction = new ArrayList<>();
-        transaction.add(50);
-        Instant instant = Instant.now();
-        Timestamp timestamp = Timestamp.from(instant);
+    public static void main(String[] args) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+//        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+//
+//        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+//        List<Integer> transaction = new ArrayList<>();
+//        transaction.add(50);
+//        Instant instant = Instant.now();
+//        Timestamp timestamp = Timestamp.from(instant);
 
 
         // ======================= FINDBY ID TRANSACTION
@@ -79,14 +82,34 @@ public class Main {
 
                         // ===================== GET ACCOUNT BALANCE
 //        System.out.println(accountCrudOperations.getAccountBalance(timestamp, 100));
-    TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
-    transactionCategoryCrudOperations.findById(11);
+//    TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
+//    transactionCategoryCrudOperations.findById(11);
 
 //        // Appel de la méthode transfer avec les identifiants des comptes
 //        System.out.println(accountCrudOperations.transfer(1, 3, 500.00));
 
 //        TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
 //        System.out.println(transactionCategoryCrudOperations.allAccountTransactionByCategory(1, Timestamp.valueOf("2023-12-02 02:00:00"), Timestamp.valueOf("2023-12-15 13:49:08.727148")));
+
+
+
+
+
+            AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
+            System.out.println(accountCrudOperations.findAll());
+
+            CurrencyCrudOperations currencyCrudOperations = new CurrencyCrudOperations();
+            System.out.println(currencyCrudOperations.findAll());
+
+            TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+            System.out.println(transactionCrudOperations.findAll());
+
+            TransactionCategoryCrudOperations transactionCategoryCrudOperations =new TransactionCategoryCrudOperations();
+            System.out.println(transactionCategoryCrudOperations.findAll());
+
+            TransferHistoryCrudOperations transferHistoryCrudOperations = new TransferHistoryCrudOperations();
+            System.out.println(transferHistoryCrudOperations.findAll());
+
     }
 
 }

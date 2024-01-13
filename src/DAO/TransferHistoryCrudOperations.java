@@ -1,5 +1,6 @@
 package DAO;
 
+import AutoCrudOperation.AutoCrudOp;
 import JDBC.ConnectionDB;
 import models.Account;
 import models.TransferHistory;
@@ -9,39 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransferHistoryCrudOperations implements CrudOperations<TransferHistory> {
-    private ConnectionDB connectionDB;
-    private final String transferHistoryIdCol = "transfer_history_id";
-    private final String debtorTransactionIdCol = "debtor_transaction_id";
-    private final String creditorTransactionIdCol = "creditor_transaction_id";
-    private final String transferDateCol = "transfer_date";
+    private final ConnectionDB connectionDB;
 
     public TransferHistoryCrudOperations() {
         this.connectionDB = new ConnectionDB();
     }
     @Override
-    public List<TransferHistory> findAll() {
-        List<TransferHistory> transferHistories = new ArrayList<>();
-
-        try (
-                Connection connection = connectionDB.getConnection();
-                PreparedStatement statement= connection.prepareStatement("SELECT * FROM transfer_history");
-                ResultSet resultSet = statement.executeQuery()
-        ){
-            while (resultSet.next()){
-                TransferHistory transferHistory = new TransferHistory(
-
-                        resultSet.getInt(transferHistoryIdCol),
-                        resultSet.getInt(debtorTransactionIdCol),
-                        resultSet.getInt(creditorTransactionIdCol),
-                        resultSet.getTimestamp(transferDateCol)
-
-                );
-                transferHistories.add(transferHistory);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return transferHistories;
+    public List<TransferHistory> findAll() throws SQLException {
+        AutoCrudOp<TransferHistory> autoCrudOp = new AutoCrudOp<>(TransferHistory.class);
+        return autoCrudOp.findAll();
     }
 
     @Override
@@ -49,12 +26,16 @@ public class TransferHistoryCrudOperations implements CrudOperations<TransferHis
         TransferHistory transferHistory = null;
 
         try (Connection connection = connectionDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transfer_history WHERE transfer_history_id = ?");
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transfer_history WHERE id = ?");
 
         ) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
+            String transferHistoryIdCol = "id";
+            String debtorTransactionIdCol = "debtor_transaction_id";
+            String creditorTransactionIdCol = "creditor_transaction_id";
+            String transferDateCol = "transfer_date";
             transferHistory = new TransferHistory(
 
                     resultSet.getInt(transferHistoryIdCol),
@@ -75,7 +56,7 @@ public class TransferHistoryCrudOperations implements CrudOperations<TransferHis
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement insertStatement = connection.prepareStatement(
                         
-                            "INSERT INTO transfer_history (transfer_history_id, debtor_transaction_id ,creditor_transaction_id, transfer_date) VALUES (?, ?, ?, ?)"
+                            "INSERT INTO transfer_history (id, debtor_transaction_id ,creditor_transaction_id, transfer_date) VALUES (?, ?, ?, ?)"
                     
                 )) {
                         insertStatement.setInt(1,transferHistory.getId());
@@ -90,7 +71,7 @@ public class TransferHistoryCrudOperations implements CrudOperations<TransferHis
 
         return transferHistory;
     }
-    public List<TransferHistory> getTransferHistories (Timestamp startDate, Timestamp endDate){
+    public List<TransferHistory> getTransferHistories (Timestamp startDate, Timestamp endDate) throws SQLException {
 
         TransferHistoryCrudOperations transferHistoryCrudOperations = new TransferHistoryCrudOperations();
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();

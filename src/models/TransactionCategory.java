@@ -7,6 +7,9 @@ public class TransactionCategory {
     private String name;
     private String type;
 
+    public TransactionCategory() {
+    }
+
     @Override
     public String toString() {
         return "TransactionCategory{" +

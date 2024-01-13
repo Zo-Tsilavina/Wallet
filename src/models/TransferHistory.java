@@ -9,6 +9,9 @@ public class TransferHistory {
     private int creditorTransactionId;
     private Timestamp transferDate;
 
+    public TransferHistory() {
+    }
+
     public TransferHistory(int id, int debtorTransactionId, int creditorTransactionId, Timestamp transferDate) {
         this.id = id;
         this.debtorTransactionId = debtorTransactionId;

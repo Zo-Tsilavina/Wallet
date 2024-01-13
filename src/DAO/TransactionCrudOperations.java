@@ -1,5 +1,6 @@
 package DAO;
 
+import AutoCrudOperation.AutoCrudOp;
 import JDBC.ConnectionDB;
 import models.Transaction;
 
@@ -7,59 +8,36 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionCrudOperations implements CrudOperations<Transaction>{
-    private ConnectionDB connectionDB;
+    private final ConnectionDB connectionDB;
 
     public TransactionCrudOperations() {
         this.connectionDB = new ConnectionDB();
     }
-    private final String transactionIdCol = "transaction_id";
-    private final String transactionLabelCol = "label";
-    private final String transactionValueCol = "value";
-    private final String transactionDateCol = "date_time_transaction";
-    private final String transactionCategoryIdCol = "transaction_category_id";
-
-
 
     @Override
-    public List<Transaction> findAll() {
-        List<Transaction> transactions = new ArrayList<>();
-
-        try (
-                Connection connection = connectionDB.getConnection();
-                PreparedStatement statement= connection.prepareStatement("SELECT * FROM transactions");
-                ResultSet resultSet = statement.executeQuery()
-        ){
-            while (resultSet.next()){
-                Transaction transaction = new Transaction(
-                        resultSet.getInt(transactionIdCol),
-                        resultSet.getString(transactionLabelCol),
-                        resultSet.getDouble(transactionValueCol),
-                        resultSet.getTimestamp(transactionDateCol),
-                        resultSet.getInt(transactionCategoryIdCol)
-                );
-                transactions.add(transaction);
-                connection.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return transactions;
+    public List<Transaction> findAll() throws SQLException {
+        AutoCrudOp<Transaction> autoCrudOp = new AutoCrudOp<>(Transaction.class);
+        return autoCrudOp.findAll();
     }
 
     @Override
     public Transaction findById(int id) {
         Transaction transaction = null;
         try (Connection connection = connectionDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transactions WHERE transaction_id = ?");
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transaction WHERE id = ?");
 
         ) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
+                    String transactionLabelCol = "label";
+                    String transactionIdCol = "id";
+                    String transactionValueCol = "value";
+                    String transactionDateCol = "date_time_transaction";
+                    String transactionCategoryIdCol = "transaction_category_id";
                     transaction = new Transaction(
                             resultSet.getInt(transactionIdCol),
                             resultSet.getString(transactionLabelCol),
@@ -80,7 +58,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM transactions WHERE transaction_id = ? AND label = ? AND value = ? AND date_time_transaction = ? AND transaction_category_id = ?"
+                        "SELECT * FROM transaction WHERE id = ? AND label = ? AND value = ? AND date_time_transaction = ? AND transaction_category_id = ?"
                 )
         ) {
             selectStatement.setInt(1, transaction.getId());
@@ -92,7 +70,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
                     try (PreparedStatement updateStatement = connection.prepareStatement(
-                            "UPDATE transactions SET value = ?, date_time_transaction = ? WHERE transaction_id = ? AND label = ? AND transaction_category_id = ?"
+                            "UPDATE transaction SET value = ?, date_time_transaction = ? WHERE id = ? AND label = ? AND transaction_category_id = ?"
                     )) {
                         updateStatement.setDouble(1, transaction.getValue());
                         updateStatement.setTimestamp(2, transaction.getDateTimeTransaction());
@@ -104,7 +82,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction>{
                     }
                 } else {
                     try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO transactions (transaction_id, label, value, date_time_transaction, transaction_category_id) VALUES (?, ?, ?, ?, ?)"
+                            "INSERT INTO transaction (id, label, value, date_time_transaction, transaction_category_id) VALUES (?, ?, ?, ?, ?)"
                     )) {
                         insertStatement.setInt(1,transaction.getId());
                         insertStatement.setString(2, transaction.getLabel());

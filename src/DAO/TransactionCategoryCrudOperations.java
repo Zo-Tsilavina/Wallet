@@ -1,5 +1,6 @@
 package DAO;
 
+import AutoCrudOperation.AutoCrudOp;
 import JDBC.ConnectionDB;
 import models.Account;
 import models.Transaction;
@@ -9,51 +10,32 @@ import java.sql.*;
 import java.util.*;
 
 public class TransactionCategoryCrudOperations implements CrudOperations<TransactionCategory> {
-    private ConnectionDB connectionDB;
+    private final ConnectionDB connectionDB;
 
     public TransactionCategoryCrudOperations() {
         this.connectionDB = new ConnectionDB();
     }
-    private final String transactionCategoryIdCol = "transaction_category_id";
-    private final String transactionCategoryNameCol = "name";
-    private final String transactionCategoryTypeCol = "type";
-
 
 
     @Override
-    public List<TransactionCategory> findAll() {
-        List<TransactionCategory> transactionsCategories = new ArrayList<>();
-
-        try (
-                Connection connection = connectionDB.getConnection();
-                PreparedStatement statement= connection.prepareStatement("SELECT * FROM transaction_categories");
-                ResultSet resultSet = statement.executeQuery()
-        ){
-            while (resultSet.next()){
-                TransactionCategory transactionCategory = new TransactionCategory(
-                        resultSet.getInt(transactionCategoryIdCol),
-                        resultSet.getString(transactionCategoryNameCol),
-                        resultSet.getString(transactionCategoryTypeCol)
-                );
-                transactionsCategories.add(transactionCategory);
-                connection.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return transactionsCategories;
+    public List<TransactionCategory> findAll() throws SQLException {
+        AutoCrudOp<TransactionCategory> autoCrudOp = new AutoCrudOp<>(TransactionCategory.class);
+        return autoCrudOp.findAll();
     }
 
     @Override
     public TransactionCategory findById(int id) {
         TransactionCategory transactionCategory = null;
         try (Connection connection = connectionDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transaction_categories WHERE transaction_category_id = ?");
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transaction_category WHERE id = ?");
 
         ) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
+                    String transactionCategoryNameCol = "name";
+                    String transactionCategoryIdCol = "id";
+                    String transactionCategoryTypeCol = "type";
                     transactionCategory = new TransactionCategory(
                             resultSet.getInt(transactionCategoryIdCol),
                             resultSet.getString(transactionCategoryNameCol),
@@ -72,7 +54,7 @@ public class TransactionCategoryCrudOperations implements CrudOperations<Transac
         try (
                 Connection connection = connectionDB.getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM transaction_categories WHERE transaction_category_id = ? AND name = ?"
+                        "SELECT * FROM transaction_category WHERE id = ? AND name = ?"
                 )
         ) {
             selectStatement.setInt(1, transactionCategory.getId());
@@ -84,7 +66,7 @@ public class TransactionCategoryCrudOperations implements CrudOperations<Transac
                     return transactionCategory;
                 } else {
                     try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO transaction_categories (transaction_category_id, name, type) VALUES (?, ?, ?)"
+                            "INSERT INTO transaction_category (id, name, type) VALUES (?, ?, ?)"
                     )) {
                         insertStatement.setInt(1, transactionCategory.getId());
                         insertStatement.setString(2, transactionCategory.getName());

@@ -10,6 +10,9 @@ public class Transaction {
     private Timestamp dateTimeTransaction;
     private int transactionCategoryId;
 
+    public Transaction() {
+    }
+
     @Override
     public String toString() {
         return "Transaction{" +
