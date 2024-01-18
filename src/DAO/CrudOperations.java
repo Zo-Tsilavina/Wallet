@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface CrudOperations<T> {
     List<T> findAll() throws SQLException;
-    T findById(int id);
-    T save(T toSave);
+    T findById(int id) throws SQLException;
+    T save(T toSave) throws SQLException;
 }

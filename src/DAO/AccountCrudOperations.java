@@ -28,90 +28,19 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     }
 
     @Override
-    public Account findById(int id) {
-        Account account = null;
-        try (Connection connection = connectionDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM account WHERE id = ?");
-        ) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    String transactionsId = resultSet.getString("transactions_id");
-                    account = new Account(
-                            resultSet.getInt("id"),
-                            resultSet.getString("name"),
-                            resultSet.getDouble("amount"),
-                            resultSet.getTimestamp("last_update_date"),
-
-                            Arrays.stream(transactionsId.split(","))
-                                    .map(Integer::parseInt)
-                                    .collect(Collectors.toList()),
-
-                            resultSet.getInt("currency_id"),
-                            resultSet.getString("type")
-                    );
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return account;
+    public Account findById(int id) throws SQLException {
+        AutoCrudOp<Account> autoCrudOp = new AutoCrudOp<>(Account.class);
+        return autoCrudOp.findById(id);
     }
 
 
     @Override
     public Account save(Account account) {
-        try (
-                Connection connection = connectionDB.getConnection();
-                PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM account WHERE id = ?"
-                )
-        ) {
-            selectStatement.setInt(1,account.getId());
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    try (PreparedStatement updateStatement = connection.prepareStatement(
-                            "UPDATE account SET name = ?, type = ?, amount = ?, transactions_id = ? , last_update_date = ? WHERE id = ?"
-                    )) {
-                        updateStatement.setString(1, account.getName());
-                        updateStatement.setString(2, account.getType());
-                        updateStatement.setDouble(3, account.getAmount());
-                        updateStatement.setString(4, account.getTransactionsId()
-                                .stream()
-                                .map(Object::toString)
-                                .collect(Collectors.joining(",")));
-                        updateStatement.setTimestamp(5, account.getLastUpdateDate());
-                        updateStatement.setInt(6, account.getId());
-
-                        updateStatement.executeUpdate();
-                    }
-                } else {
-                    try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO account (id, name, amount, last_update_date, transactions_id, currency_id, type) VALUES (?, ?, ?, ?, ?, ?, ?)"
-                    )) {
-                        insertStatement.setInt(1, account.getId());
-                        insertStatement.setString(2, account.getName());
-                        insertStatement.setDouble(3, account.getAmount());
-                        insertStatement.setTimestamp(4, account.getLastUpdateDate());
-                        insertStatement.setString(5, account.getTransactionsId()
-                                .stream()
-                                .map(Object::toString)
-                                .collect(Collectors.joining(",")));
-                        insertStatement.setInt(6, account.getCurrencyId());
-                        insertStatement.setString(7, account.getType());
-
-                        insertStatement.executeUpdate();
-                    }
-                }
-                connection.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return account;
+        AutoCrudOp<Account> autoCrudOp = new AutoCrudOp<>(Account.class);
+        return autoCrudOp.save(account);
     }
 
-    public Account doTransaction (Transaction transaction, int accountId){
+    public Account doTransaction (Transaction transaction, int accountId) throws SQLException {
 
         TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
@@ -153,7 +82,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return account;
     }
 
-    public Account getAccountBalance (Timestamp timestamp, int accountId){
+    public Account getAccountBalance (Timestamp timestamp, int accountId) throws SQLException {
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
         Account account = accountCrudOperations.findById(accountId);
         List<Integer> currentTransactionIdList = new ArrayList<>();
@@ -188,7 +117,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return account;
     }
 
-    public List<Account> getAccountBalanceHistory (Timestamp startDate, Timestamp endDate, int accountId){
+    public List<Account> getAccountBalanceHistory (Timestamp startDate, Timestamp endDate, int accountId) throws SQLException {
 
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
         Account account = accountCrudOperations.findById(accountId);
@@ -252,7 +181,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return accounts;
 
     }
-    public List<Account> transfer(int creditorId, int debtorId, double amount) {
+    public List<Account> transfer(int creditorId, int debtorId, double amount) throws SQLException {
 
         AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
         Account creditor = accountCrudOperations.findById(creditorId);

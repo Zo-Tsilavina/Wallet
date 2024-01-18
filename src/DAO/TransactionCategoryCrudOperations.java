@@ -24,65 +24,17 @@ public class TransactionCategoryCrudOperations implements CrudOperations<Transac
     }
 
     @Override
-    public TransactionCategory findById(int id) {
-        TransactionCategory transactionCategory = null;
-        try (Connection connection = connectionDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transaction_category WHERE id = ?");
-
-        ) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    String transactionCategoryNameCol = "name";
-                    String transactionCategoryIdCol = "id";
-                    String transactionCategoryTypeCol = "type";
-                    transactionCategory = new TransactionCategory(
-                            resultSet.getInt(transactionCategoryIdCol),
-                            resultSet.getString(transactionCategoryNameCol),
-                            resultSet.getString(transactionCategoryTypeCol)
-                    );
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return transactionCategory;
+    public TransactionCategory findById(int id) throws SQLException {
+        AutoCrudOp<TransactionCategory> autoCrudOp = new AutoCrudOp<>(TransactionCategory.class);
+        return autoCrudOp.findById(id);
     }
 
     @Override
     public TransactionCategory save(TransactionCategory transactionCategory) {
-        try (
-                Connection connection = connectionDB.getConnection();
-                PreparedStatement selectStatement = connection.prepareStatement(
-                        "SELECT * FROM transaction_category WHERE id = ? AND name = ?"
-                )
-        ) {
-            selectStatement.setInt(1, transactionCategory.getId());
-            selectStatement.setString(2, transactionCategory.getName());
-
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    System.out.println("this transaction category already exist");
-                    return transactionCategory;
-                } else {
-                    try (PreparedStatement insertStatement = connection.prepareStatement(
-                            "INSERT INTO transaction_category (id, name, type) VALUES (?, ?, ?)"
-                    )) {
-                        insertStatement.setInt(1, transactionCategory.getId());
-                        insertStatement.setString(2, transactionCategory.getName());
-                        insertStatement.setString(3,transactionCategory.getType());
-
-                        insertStatement.executeUpdate();
-                    }
-                }
-                connection.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return transactionCategory;
+        AutoCrudOp<TransactionCategory> autoCrudOp = new AutoCrudOp<>(TransactionCategory.class);
+        return autoCrudOp.save(transactionCategory);
     }
-    public Map<String, Double> allAccountTransactionByCategory (int accountId, Timestamp startDate, Timestamp endDate){
+    public Map<String, Double> allAccountTransactionByCategory (int accountId, Timestamp startDate, Timestamp endDate) throws SQLException {
 
             AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
             Account account = accountCrudOperations.findById(accountId);
@@ -92,11 +44,26 @@ public class TransactionCategoryCrudOperations implements CrudOperations<Transac
             allTransactionId.forEach(transactionId -> {
 
                 TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
-                Transaction currentTransaction = transactionCrudOperations.findById(transactionId);
+                Transaction currentTransaction = null;
+
+                try {
+                    currentTransaction = transactionCrudOperations.findById(transactionId);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                assert currentTransaction != null;
                 int currentTransactionCategoryId = currentTransaction.getTransactionCategoryId();
 
                 TransactionCategoryCrudOperations transactionCategoryCrudOperations = new TransactionCategoryCrudOperations();
-                TransactionCategory currentTransactionCategory = transactionCategoryCrudOperations.findById(currentTransactionCategoryId);
+                TransactionCategory currentTransactionCategory = null;
+
+                try {
+                    currentTransactionCategory = transactionCategoryCrudOperations.findById(currentTransactionCategoryId);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
                 String currentTransactionCategoryName = currentTransactionCategory.getName();
                 Timestamp currentTransactionTimestamp = currentTransaction.getDateTimeTransaction();
 

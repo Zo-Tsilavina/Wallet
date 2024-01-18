@@ -21,10 +21,10 @@ public class Main {
 //        TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
 //
 //        AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-//        List<Integer> transaction = new ArrayList<>();
-//        transaction.add(50);
-//        Instant instant = Instant.now();
-//        Timestamp timestamp = Timestamp.from(instant);
+        List<Integer> transaction = new ArrayList<>();
+        transaction.add(50);
+        Instant instant = Instant.now();
+        Timestamp timestamp = Timestamp.from(instant);
 
 
         // ======================= FINDBY ID TRANSACTION
@@ -92,23 +92,37 @@ public class Main {
 //        System.out.println(transactionCategoryCrudOperations.allAccountTransactionByCategory(1, Timestamp.valueOf("2023-12-02 02:00:00"), Timestamp.valueOf("2023-12-15 13:49:08.727148")));
 
 
-
-
+            Account ratsila = new Account(
+                9,
+                "kozyyy",
+                14000.00,
+                timestamp,
+                transaction,
+                1,
+                "compte bancaire"
+        );
 
             AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
-            System.out.println(accountCrudOperations.findAll());
+            System.out.println(accountCrudOperations.save(ratsila));
 
-            CurrencyCrudOperations currencyCrudOperations = new CurrencyCrudOperations();
-            System.out.println(currencyCrudOperations.findAll());
-
-            TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
-            System.out.println(transactionCrudOperations.findAll());
-
-            TransactionCategoryCrudOperations transactionCategoryCrudOperations =new TransactionCategoryCrudOperations();
-            System.out.println(transactionCategoryCrudOperations.findAll());
-
-            TransferHistoryCrudOperations transferHistoryCrudOperations = new TransferHistoryCrudOperations();
-            System.out.println(transferHistoryCrudOperations.findAll());
+////            System.out.println(accountCrudOperations.findAll());
+//            System.out.println(accountCrudOperations.findById(1));
+//
+//            CurrencyCrudOperations currencyCrudOperations = new CurrencyCrudOperations();
+////            System.out.println(currencyCrudOperations.findAll());
+//            System.out.println(currencyCrudOperations.findById(1));
+//
+//            TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+////            System.out.println(transactionCrudOperations.findAll());
+//            System.out.println(transactionCrudOperations.findById(1));
+//
+//            TransactionCategoryCrudOperations transactionCategoryCrudOperations =new TransactionCategoryCrudOperations();
+////            System.out.println(transactionCategoryCrudOperations.findAll());
+//            System.out.println(transactionCategoryCrudOperations.findById(1));
+//
+//            TransferHistoryCrudOperations transferHistoryCrudOperations = new TransferHistoryCrudOperations();
+////            System.out.println(transferHistoryCrudOperations.findAll());
+//            System.out.println(transferHistoryCrudOperations.findById(1));
 
     }
 

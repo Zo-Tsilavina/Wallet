@@ -3,6 +3,7 @@ package DAO;
 import AutoCrudOperation.AutoCrudOp;
 import JDBC.ConnectionDB;
 import models.Account;
+import models.Transaction;
 import models.TransferHistory;
 
 import java.sql.*;
@@ -22,54 +23,15 @@ public class TransferHistoryCrudOperations implements CrudOperations<TransferHis
     }
 
     @Override
-    public TransferHistory findById(int id) {
-        TransferHistory transferHistory = null;
-
-        try (Connection connection = connectionDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM transfer_history WHERE id = ?");
-
-        ) {
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            String transferHistoryIdCol = "id";
-            String debtorTransactionIdCol = "debtor_transaction_id";
-            String creditorTransactionIdCol = "creditor_transaction_id";
-            String transferDateCol = "transfer_date";
-            transferHistory = new TransferHistory(
-
-                    resultSet.getInt(transferHistoryIdCol),
-                    resultSet.getInt(debtorTransactionIdCol),
-                    resultSet.getInt(creditorTransactionIdCol),
-                    resultSet.getTimestamp(transferDateCol)
-
-            );
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return transferHistory;
+    public TransferHistory findById(int id) throws SQLException {
+        AutoCrudOp<TransferHistory> autoCrudOp = new AutoCrudOp<>(TransferHistory.class);
+        return autoCrudOp.findById(id);
     }
 
     @Override
     public TransferHistory save(TransferHistory transferHistory) {
-        try (
-                Connection connection = connectionDB.getConnection();
-                PreparedStatement insertStatement = connection.prepareStatement(
-                        
-                            "INSERT INTO transfer_history (id, debtor_transaction_id ,creditor_transaction_id, transfer_date) VALUES (?, ?, ?, ?)"
-                    
-                )) {
-                        insertStatement.setInt(1,transferHistory.getId());
-                        insertStatement.setInt(2,transferHistory.getDebtorTransactionId());
-                        insertStatement.setInt(3,transferHistory.getCreditorTransactionId());
-                        insertStatement.setTimestamp(4, transferHistory.getTransferDate());
-                        
-                        insertStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return transferHistory;
+        AutoCrudOp<TransferHistory> autoCrudOp = new AutoCrudOp<>(TransferHistory.class);
+        return autoCrudOp.save(transferHistory);
     }
     public List<TransferHistory> getTransferHistories (Timestamp startDate, Timestamp endDate) throws SQLException {
 
@@ -102,7 +64,12 @@ public class TransferHistoryCrudOperations implements CrudOperations<TransferHis
                     return account.getTransactionsId().contains(creditorTransactionId);
                 });
 
-                Double transferAmount = transactionCrudOperations.findById(transferHistory.getCreditorTransactionId()).getValue();
+                Double transferAmount = null;
+                try {
+                    transferAmount = transactionCrudOperations.findById(transferHistory.getCreditorTransactionId()).getValue();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
 
                 Timestamp transferDate = transferHistory.getTransferDate();
 
